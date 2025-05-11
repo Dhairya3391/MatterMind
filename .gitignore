@@ -1,0 +1,49 @@
+# dependencies
+/node_modules
+
+# build
+/dist
+
+# dotenv environment variables
+.env
+.env.*.local
+
+# Vite cache
+/.vite
+
+# local IDE config
+.vscode/
+.idea/
+*.suo
+.ntvs
+*.njsproj
+*.sln
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# testing
+/coverage
+
+# typescript
+*.tsbuildinfo
+
+# Optional: macOS/Linux files
+*.swp
+*.bak
+
+# Optional: SASS cache
+.sass-cache
+
+# Optional: local history (for JetBrains IDEs)
+/.local-history
+
+# Optional: bundler specific
+.parcel-cache
