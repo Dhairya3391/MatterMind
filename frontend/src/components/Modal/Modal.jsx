@@ -1,62 +1,30 @@
-import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 
-export default function Modal() {
-  let [isOpen, setIsOpen] = useState(true);
+export default function Canvas() {
+  const canvasRef = useRef(null);
 
-  function open() {
-    setIsOpen(true);
-  }
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
 
-  function close() {
-    setIsOpen(false);
-  }
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth * 0.9;
+      canvas.height = window.innerHeight * 0.9;
+
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    };
+
+    resizeCanvas();
+
+    window.addEventListener("resize", resizeCanvas);
+
+    return () => window.removeEventListener("resize", resizeCanvas);
+  }, []);
 
   return (
-    <>
-      <div className="flex flex-col">
-        <div className="flex items-center justify-center">
-          <Button
-            onClick={open}
-            className="rounded-md bg-black/20 px-4 py-2 text-sm font-medium text-white focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-black/30 text-center w-fit"
-          >
-            Open dialog
-          </Button>
-        </div>
-        <Dialog
-          open={isOpen}
-          as="div"
-          className="relative z-10 focus:outline-none"
-          onClose={close}
-        >
-          <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4">
-              <DialogPanel
-                transition
-                className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
-              >
-                <DialogTitle
-                  as="h3"
-                  className="text-base/7 font-medium text-white"
-                >
-                  Welcome to Mattermind
-                </DialogTitle>
-                <p className="mt-2 text-sm/6 text-white/50">
-                  Your physics buddy.
-                </p>
-                <div className="mt-4">
-                  <Button
-                    className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700"
-                    onClick={close}
-                  >
-                    Got it, thanks!
-                  </Button>
-                </div>
-              </DialogPanel>
-            </div>
-          </div>
-        </Dialog>
-      </div>
-    </>
+    <div className="w-full h-screen bg-black flex items-center justify-center">
+      <canvas ref={canvasRef} className="border border-gray-700 shadow-lg" />
+    </div>
   );
 }
