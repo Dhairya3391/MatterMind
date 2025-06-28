@@ -6,13 +6,20 @@
     objectsStore,
     selectedObjectStore,
   } from "$lib/stores/physics.store";
-  import type { PhysicsCanvasProps } from "$lib/types/physics.types";
+  import type {
+    PhysicsCanvasProps,
+    PhysicsObject,
+  } from "$lib/types/physics.types";
+  import type { Body } from "matter-js";
+  import "$lib/types/global.types";
 
   // Props
   export let width: number = 800;
   export let height: number = 600;
   export let showVectors: boolean = false;
-  export let onObjectSelected: ((object: any) => void) | undefined = undefined;
+  export let onObjectSelected:
+    | ((object: PhysicsObject | null) => void)
+    | undefined = undefined;
 
   // Component state
   let canvas: HTMLCanvasElement;
@@ -40,9 +47,13 @@
       physicsEngine = new PhysicsEngine("physicsCanvas");
 
       // Set up object selection callback
-      physicsEngine.setOnObjectSelected((body) => {
-        if (onObjectSelected) {
-          onObjectSelected(body);
+      physicsEngine.setOnObjectSelected((body: Body | null) => {
+        if (onObjectSelected && body) {
+          // Find the corresponding PhysicsObject from the store
+          const physicsObject = $objectsStore.find((obj) => obj.id === body.id);
+          onObjectSelected(physicsObject || null);
+        } else if (onObjectSelected) {
+          onObjectSelected(null);
         }
       });
 
@@ -55,7 +66,7 @@
 
       // Expose the physics engine globally for the parent component
       if (typeof window !== "undefined") {
-        (window as any).matterMindPhysicsEngine = physicsEngine;
+        window.matterMindPhysicsEngine = physicsEngine;
       }
 
       console.log("✅ Physics engine initialized successfully");
@@ -90,7 +101,7 @@
     }
     // Clean up global reference
     if (typeof window !== "undefined") {
-      delete (window as any).matterMindPhysicsEngine;
+      delete window.matterMindPhysicsEngine;
     }
   }
 
@@ -196,7 +207,8 @@
     width: 100%;
     height: 100%;
     display: block;
-    background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
+    background:
+      linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
       linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
       linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
       linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);

@@ -1,12 +1,17 @@
 import Matter from "matter-js";
-const { Engine, World, Bodies, Body, Vector, Events, Runner } = Matter;
-import type {
-  ObjectConfig,
-  PhysicsObject,
-  MatterBody,
-  MaterialPreset,
-  MATERIAL_PRESETS,
-} from "$lib/types/physics.types";
+const { Engine, World, Bodies, Body, Runner } = Matter;
+import type { ObjectConfig, PhysicsObject } from "$lib/types/physics.types";
+
+// Extended Matter.js body interface
+interface ExtendedMatterBody extends Matter.Body {
+  airResistance?: number;
+  isHollow?: boolean;
+  material?: string;
+  tags?: string[];
+  isPolygon?: boolean;
+  polygonRadius?: number;
+  circleRadius?: number;
+}
 
 export class PhysicsEngine {
   private engine!: Matter.Engine;
@@ -27,12 +32,10 @@ export class PhysicsEngine {
     this.ctx = this.canvas.getContext("2d")!;
 
     if (!this.canvas) {
-      console.error(`Canvas with id '${canvasId}' not found`);
       throw new Error(`Canvas with id '${canvasId}' not found`);
     }
 
     if (!this.ctx) {
-      console.error("Could not get 2D context from canvas");
       throw new Error("Could not get 2D context from canvas");
     }
 
@@ -164,13 +167,6 @@ export class PhysicsEngine {
     const x = Math.max(bounds.minX + 50, Math.min(bounds.maxX - 50, config.x));
     const y = Math.max(bounds.minY + 50, Math.min(bounds.maxY - 50, config.y));
 
-    console.log("Creating object:", {
-      originalPosition: { x: config.x, y: config.y },
-      adjustedPosition: { x, y },
-      canvasBounds: bounds,
-      shape: config.shape,
-    });
-
     let body: Matter.Body;
     const {
       shape,
@@ -232,8 +228,8 @@ export class PhysicsEngine {
           angle: (rotation * Math.PI) / 180,
         });
         // Mark as polygon for custom rendering
-        (body as any).isPolygon = true;
-        (body as any).polygonRadius = radius;
+        (body as ExtendedMatterBody).isPolygon = true;
+        (body as ExtendedMatterBody).polygonRadius = radius;
         break;
 
       default:
@@ -252,10 +248,10 @@ export class PhysicsEngine {
       }
 
       // Add custom properties
-      (body as MatterBody).airResistance = airResistance || 0;
-      (body as MatterBody).isHollow = isHollow || false;
-      (body as MatterBody).material = material;
-      (body as MatterBody).tags = tags || [];
+      (body as ExtendedMatterBody).airResistance = airResistance || 0;
+      (body as ExtendedMatterBody).isHollow = isHollow || false;
+      (body as ExtendedMatterBody).material = material;
+      (body as ExtendedMatterBody).tags = tags || [];
 
       // Store object metadata
       const objectData: PhysicsObject = {
@@ -350,19 +346,19 @@ export class PhysicsEngine {
 
     // Update custom properties
     if (config.airResistance !== undefined) {
-      (body as MatterBody).airResistance = config.airResistance;
+      (body as ExtendedMatterBody).airResistance = config.airResistance;
     }
 
     if (config.isHollow !== undefined) {
-      (body as MatterBody).isHollow = config.isHollow;
+      (body as ExtendedMatterBody).isHollow = config.isHollow;
     }
 
     if (config.material !== undefined) {
-      (body as MatterBody).material = config.material;
+      (body as ExtendedMatterBody).material = config.material;
     }
 
     if (config.tags !== undefined) {
-      (body as MatterBody).tags = config.tags;
+      (body as ExtendedMatterBody).tags = config.tags;
     }
 
     // Update metadata
@@ -383,8 +379,9 @@ export class PhysicsEngine {
   }
 
   private calculateBodyArea(body: Matter.Body): number {
-    if ((body as any).circleRadius) {
-      return Math.PI * (body as any).circleRadius * (body as any).circleRadius;
+    const extendedBody = body as ExtendedMatterBody;
+    if (extendedBody.circleRadius) {
+      return Math.PI * extendedBody.circleRadius * extendedBody.circleRadius;
     } else {
       // Approximate area for polygons
       const vertices = body.vertices;
@@ -493,9 +490,10 @@ export class PhysicsEngine {
     this.ctx.rotate(body.angle);
 
     // Draw based on body type
-    if ((body as any).isPolygon) {
+    const extendedBody = body as ExtendedMatterBody;
+    if (extendedBody.isPolygon) {
       this.renderCustomPolygon(body);
-    } else if ((body as any).circleRadius) {
+    } else if (extendedBody.circleRadius) {
       this.renderCircle(body as Matter.Body & { circleRadius: number });
     } else {
       this.renderRectangle(body);
@@ -517,8 +515,9 @@ export class PhysicsEngine {
 
   private renderCustomPolygon(body: Matter.Body): void {
     // Check if it's a custom polygon (hexagon)
-    if ((body as any).isPolygon) {
-      const radius = (body as any).polygonRadius || 25;
+    const extendedBody = body as ExtendedMatterBody;
+    if (extendedBody.isPolygon) {
+      const radius = extendedBody.polygonRadius || 25;
       const sides = 6; // Hexagon
 
       this.ctx.beginPath();
@@ -577,7 +576,6 @@ export class PhysicsEngine {
   private renderPreviewObject(): void {
     if (!this.previewObject) return;
 
-    console.log("Rendering preview object:", this.previewObject);
     const bounds = this.getCanvasBounds();
     const center = { x: bounds.maxX / 2, y: bounds.maxY / 2 };
     const config = {
@@ -786,7 +784,6 @@ export class PhysicsEngine {
   }
 
   public setPreviewObject(config: ObjectConfig | null): void {
-    console.log("setPreviewObject called with:", config);
     this.previewObject = config;
   }
 

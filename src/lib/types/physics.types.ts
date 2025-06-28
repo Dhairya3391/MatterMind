@@ -95,14 +95,6 @@ export interface SceneLoadedEvent {
   scene: SceneData;
 }
 
-// Matter.js type extensions
-export interface MatterBody extends Body {
-  airResistance?: number;
-  isHollow?: boolean;
-  material?: string;
-  tags?: string[];
-}
-
 // Store types
 export interface AppState {
   physics: PhysicsState;

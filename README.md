@@ -1,38 +1,196 @@
-# sv
+# MatterMind - Interactive Physics Simulation
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A modern, interactive physics simulation platform built with **SvelteKit** and **Matter.js**. Create, customize, and experiment with realistic 2D physical objects in a beautiful, responsive interface.
 
-## Creating a project
+## ✨ Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **🎮 Interactive Physics Engine**: Real-time physics simulation with Matter.js
+- **🎨 Beautiful UI**: Modern design with DaisyUI and Tailwind CSS
+- **📦 Object Management**: Create, edit, and delete physics objects
+- **🎯 Material Presets**: Pre-configured materials (wood, metal, rubber, plastic, stone)
+- **📐 Vector Visualization**: Toggle velocity vectors for better understanding
+- **🌍 Gravity Control**: Enable/disable gravity simulation
+- **🎪 Multiple Shapes**: Rectangle, circle, and polygon objects
+- **🏷️ Custom Properties**: Mass, density, friction, elasticity, air resistance
+- **⚡ Real-time Preview**: See objects before creating them
+- **📱 Responsive Design**: Works on desktop and mobile devices
 
-```bash
-# create a new project in the current directory
-npx sv create
+## 🚀 Quick Start
 
-# create a new project in my-app
-npx sv create my-app
-```
+### Prerequisites
 
-## Developing
+- Node.js 18+
+- pnpm (recommended) or npm
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
+### Installation
 
 ```bash
-npm run build
+# Clone the repository
+git clone <repository-url>
+cd MatterMind
+
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm run dev
 ```
 
-You can preview the production build with `npm run preview`.
+The application will be available at `http://localhost:5173`
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## 🏗️ Architecture
+
+### Component Structure
+
+The application follows a modular component architecture:
+
+```
+src/lib/components/
+├── Header.svelte           # Application header with stats
+├── Sidebar.svelte          # Main sidebar with tabs
+├── PhysicsCanvas.svelte    # Physics simulation canvas
+├── SimulationControls.svelte # Simulation control buttons
+├── ObjectForm.svelte       # Object creation/editing form
+├── ObjectsList.svelte      # List of created objects
+└── SettingsPanel.svelte    # Application settings
+```
+
+### State Management
+
+Uses Svelte stores for reactive state management:
+
+- `physicsStore`: Simulation state (running, gravity, vectors, FPS)
+- `objectsStore`: List of physics objects
+- `selectedObjectStore`: Currently selected object
+- `sceneStore`: Scene data and presets
+
+### Physics Engine
+
+Custom physics engine wrapper around Matter.js with:
+
+- Object creation and management
+- Custom rendering with colors and labels
+- Vector visualization
+- Object selection and interaction
+- Performance monitoring
+
+## 🎮 Usage
+
+### Creating Objects
+
+1. **Select Shape**: Choose from rectangle, circle, or polygon
+2. **Set Properties**: Configure mass, friction, elasticity, etc.
+3. **Choose Material**: Use presets or create custom materials
+4. **Preview**: See the object before creating it
+5. **Create**: Click "Create Object" to add to simulation
+
+### Simulation Controls
+
+- **Play/Pause**: Toggle simulation running state
+- **Reset**: Clear all objects and restart
+- **Gravity**: Enable/disable gravity
+- **Vectors**: Show/hide velocity vectors
+- **Preset Objects**: Create demo objects automatically
+
+### Object Interaction
+
+- **Click**: Select objects to edit their properties
+- **Drag**: Move objects around the canvas
+- **Edit**: Modify properties in the sidebar
+- **Delete**: Remove objects from simulation
+
+## 🎨 Customization
+
+### Material Presets
+
+The application includes pre-configured materials:
+
+- **Wood**: Natural, moderate friction
+- **Metal**: Dense, low friction, high elasticity
+- **Rubber**: Elastic, high friction
+- **Plastic**: Lightweight, moderate properties
+- **Stone**: Heavy, high friction, low elasticity
+
+### Custom Materials
+
+Create custom materials by setting:
+
+- Density (kg/m²)
+- Friction coefficient (0-1)
+- Elasticity/restitution (0-1)
+- Color and tags
+
+## 🛠️ Development
+
+### Available Scripts
+
+```bash
+# Development
+pnpm run dev          # Start development server
+pnpm run build        # Build for production
+pnpm run preview      # Preview production build
+
+# Code Quality
+pnpm run check        # TypeScript and Svelte checking
+pnpm run lint         # Lint code
+pnpm run format       # Format code with Prettier
+```
+
+### Tech Stack
+
+- **Frontend**: SvelteKit 2.0
+- **Styling**: Tailwind CSS 4.0 + DaisyUI
+- **Physics**: Matter.js
+- **Language**: TypeScript
+- **Package Manager**: pnpm
+- **Build Tool**: Vite
+
+### Project Structure
+
+```
+MatterMind/
+├── src/
+│   ├── lib/
+│   │   ├── components/     # Svelte components
+│   │   ├── physics/        # Physics engine
+│   │   ├── stores/         # State management
+│   │   └── types/          # TypeScript types
+│   ├── routes/             # SvelteKit routes
+│   └── app.html            # HTML template
+├── static/                 # Static assets
+└── package.json           # Dependencies and scripts
+```
+
+## 🎯 Physics Concepts
+
+The simulation demonstrates various physics concepts:
+
+- **Gravity**: Objects fall under gravitational force
+- **Collisions**: Realistic collision detection and response
+- **Friction**: Objects slow down due to surface friction
+- **Elasticity**: Objects bounce based on material properties
+- **Momentum**: Conservation of momentum in collisions
+- **Air Resistance**: Optional drag forces
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [Matter.js](https://brm.io/matter-js/) - 2D physics engine
+- [SvelteKit](https://kit.svelte.dev/) - Full-stack web framework
+- [DaisyUI](https://daisyui.com/) - Component library
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+
+---
+
+**Built with ❤️ using modern web technologies**
