@@ -25,8 +25,12 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["Inter", "system-ui", "sans-serif"],
+      },
       borderRadius: {
-        xl: "0.75rem",
+        lg: "0.5rem",
+        xl: "1rem",
       },
       boxShadow: {
         lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
@@ -77,18 +81,28 @@ export default {
   daisyui: {
     themes: [
       {
-        mattermind: {
-          primary: "#3b82f6",
-          secondary: "#64748b",
-          accent: "#f59e0b",
-          neutral: "#1e293b",
-          "base-100": "#0f172a",
-          "base-200": "#1e293b",
-          "base-300": "#334155",
-          info: "#06b6d4",
-          success: "#10b981",
-          warning: "#f59e0b",
-          error: "#ef4444",
+        nextprime: {
+          "color-scheme": "dark",
+          "base-100": "hsl(30, 11%, 4%)",
+          "base-200": "hsl(199, 27%, 18%)",
+          "base-300": "hsl(33, 20%, 31%)",
+          "base-content": "hsl(31, 33%, 88%)",
+          primary: "hsl(32, 33%, 67%)",
+          "primary-content": "hsl(30, 11%, 4%)",
+          secondary: "hsl(33, 20%, 31%)",
+          "secondary-content": "hsl(31, 33%, 88%)",
+          accent: "hsl(31, 33%, 88%)",
+          "accent-content": "hsl(30, 11%, 4%)",
+          neutral: "hsl(199, 27%, 18%)",
+          "neutral-content": "hsl(31, 33%, 88%)",
+          info: "hsl(210, 100%, 65%)",
+          "info-content": "hsl(220, 100%, 15%)",
+          success: "hsl(140, 50%, 50%)",
+          "success-content": "hsl(140, 100%, 10%)",
+          warning: "hsl(45, 100%, 60%)",
+          "warning-content": "hsl(30, 100%, 10%)",
+          error: "hsl(0, 75%, 60%)",
+          "error-content": "hsl(0, 100%, 15%)",
         },
       },
     ],

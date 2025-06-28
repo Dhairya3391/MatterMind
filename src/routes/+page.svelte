@@ -42,6 +42,7 @@
   let selectedObject: PhysicsObject | null = null;
   let physicsEngine: PhysicsEngine | null = null;
   let activeTab = "create";
+  let sidebarOpen = true;
   let objectForm: ObjectFormData = {
     shape: "rectangle",
     name: "",
@@ -405,32 +406,111 @@
   />
 </svelte:head>
 
-<div class="flex flex-col h-screen bg-base-200" in:fade={{ duration: 500 }}>
+<div
+  class="min-h-screen bg-base-100 text-base-content"
+  in:fade={{ duration: 300 }}
+>
+  <!-- Header -->
   <Header />
 
-  <div class="flex flex-1 overflow-hidden">
-    <Sidebar
-      bind:activeTab
-      bind:objectForm
-      {selectedObject}
-      on:togglePause={handleTogglePause}
-      on:reset={handleReset}
-      on:createPresetObjects={createPresetObjects}
-      on:toggleGravity={handleToggleGravity}
-      on:toggleVectors={handleToggleVectors}
-      on:createObject={handleCreateObject}
-      on:updateObject={handleUpdateObject}
-      on:deleteObject={handleDeleteObject}
-    />
-
-    <!-- Main Canvas Area -->
-    <main
-      class="flex-1 flex items-center justify-center p-4 md:p-6 bg-base-200"
-    >
+  <!-- Main Content -->
+  <div class="flex h-[calc(100vh-4rem)]">
+    <!-- Sidebar -->
+    <div class="relative">
       <div
-        class="card w-full h-full bg-base-100 shadow-xl border border-base-300"
+        class="transition-all duration-300 ease-in-out {sidebarOpen
+          ? 'w-80'
+          : 'w-0'}"
+        class:overflow-hidden={!sidebarOpen}
       >
-        <div class="card-body p-0">
+        <div
+          class="w-80 h-full border-r border-base-300 bg-base-200/30 backdrop-blur-sm"
+        >
+          <Sidebar
+            bind:activeTab
+            bind:objectForm
+            {selectedObject}
+            on:togglePause={handleTogglePause}
+            on:reset={handleReset}
+            on:createPresetObjects={createPresetObjects}
+            on:toggleGravity={handleToggleGravity}
+            on:toggleVectors={handleToggleVectors}
+            on:createObject={handleCreateObject}
+            on:updateObject={handleUpdateObject}
+            on:deleteObject={handleDeleteObject}
+          />
+        </div>
+      </div>
+
+      <!-- Sidebar Toggle -->
+      <button
+        class="absolute -right-3 top-6 w-6 h-6 bg-primary text-primary-content rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+        on:click={() => (sidebarOpen = !sidebarOpen)}
+        aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+      >
+        <svg
+          class="w-3 h-3 transition-transform {sidebarOpen ? 'rotate-180' : ''}"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Canvas Area -->
+    <div class="flex-1 flex flex-col">
+      <!-- Canvas Header -->
+      <div class="p-6 border-b border-base-300 bg-base-200/20">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-semibold text-base-content">
+              Physics Canvas
+            </h1>
+            <p class="text-base-content/60 text-sm mt-1">
+              Interactive 2D physics simulation
+            </p>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-2">
+              <div class="w-2 h-2 rounded-full bg-success"></div>
+              <span class="text-sm text-base-content/70"
+                >{$physicsStore.objectCount} objects</span
+              >
+            </div>
+            <div class="flex items-center space-x-2">
+              <div class="w-2 h-2 rounded-full bg-info"></div>
+              <span class="text-sm text-base-content/70"
+                >{$physicsStore.fps} FPS</span
+              >
+            </div>
+            <div class="flex items-center space-x-2">
+              <div
+                class="w-2 h-2 rounded-full"
+                class:bg-success={$physicsStore.isRunning}
+                class:bg-warning={!$physicsStore.isRunning}
+              ></div>
+              <span class="text-sm text-base-content/70"
+                >{$physicsStore.isRunning ? "Running" : "Paused"}</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Canvas Container -->
+      <div class="flex-1 p-6">
+        <div
+          class="w-full h-full rounded-xl overflow-hidden bg-base-300/10 border border-base-300/30 shadow-xl"
+        >
           <PhysicsCanvas
             width={800}
             height={600}
@@ -439,6 +519,6 @@
           />
         </div>
       </div>
-    </main>
+    </div>
   </div>
 </div>
