@@ -1,41 +1,32 @@
 {
-  "name": "mattermind",
-  "version": "1.0.0",
-  "description": "Interactive Physics Simulation Platform using Matter.js",
-  "main": "index.html",
-  "scripts": {
-    "start": "python3 -m http.server 8000",
-    "dev": "python3 -m http.server 8000",
-    "serve": "python3 -m http.server 8000"
-  },
-  "keywords": [
-    "physics",
-    "simulation",
-    "matter.js",
-    "canvas",
-    "interactive",
-    "education",
-    "2d",
-    "javascript"
-  ],
-  "author": "Dhairya Adroja and Harpalsinh Sindhav",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/mattermind.git"
-  },
-  "bugs": {
-    "url": "https://github.com/yourusername/mattermind/issues"
-  },
-  "homepage": "https://github.com/yourusername/mattermind#readme",
-  "devDependencies": {},
-  "dependencies": {},
-  "engines": {
-    "node": ">=14.0.0"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ]
-} 
+	"name": "mattermind-svelte",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-auto": "^6.0.0",
+		"@sveltejs/kit": "^2.16.0",
+		"@sveltejs/vite-plugin-svelte": "^5.0.0",
+		"@types/matter-js": "^0.19.8",
+		"svelte": "^5.0.0",
+		"svelte-check": "^4.0.0",
+		"typescript": "^5.0.0",
+		"vite": "^6.2.6"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"esbuild"
+		]
+	},
+	"dependencies": {
+		"matter-js": "^0.20.0"
+	}
+}
