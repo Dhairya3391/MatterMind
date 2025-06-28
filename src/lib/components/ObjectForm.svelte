@@ -37,7 +37,7 @@
     deleteObject: number;
   }>();
 
-  function handleCreateObject() {
+  function handleSubmit() {
     const config: ObjectConfig = {
       shape: objectForm.shape as "rectangle" | "circle" | "polygon",
       name: objectForm.name || `Object ${Date.now()}`,
@@ -65,41 +65,14 @@
       ...(objectForm.shape === "polygon" && { radius: objectForm.radius }),
     };
 
-    dispatch("createObject", config);
+    if (selectedObject) {
+      dispatch("updateObject", { id: selectedObject.id, config });
+    } else {
+      dispatch("createObject", config);
+    }
   }
 
-  function handleUpdateObject() {
-    if (!selectedObject) return;
-
-    const config: ObjectConfig = {
-      ...selectedObject.config,
-      name: objectForm.name,
-      color: objectForm.color.startsWith("#") ? objectForm.color : "#4CAF50",
-      mass: objectForm.mass,
-      density: objectForm.density || undefined,
-      friction: objectForm.friction,
-      restitution: objectForm.restitution,
-      airResistance: objectForm.airResistance,
-      rotation: objectForm.rotation,
-      angularVelocity: objectForm.angularVelocity,
-      isStatic: objectForm.isStatic,
-      isHollow: objectForm.isHollow,
-      initialVelocityX: objectForm.initialVelocityX,
-      initialVelocityY: objectForm.initialVelocityY,
-      material: objectForm.material || undefined,
-      tags: objectForm.tags,
-      ...(objectForm.shape === "circle"
-        ? { radius: objectForm.radius }
-        : {
-            width: objectForm.width,
-            height: objectForm.height,
-          }),
-    };
-
-    dispatch("updateObject", { id: selectedObject.id, config });
-  }
-
-  function handleDeleteObject() {
+  function handleDelete() {
     if (!selectedObject) return;
     if (confirm("Are you sure you want to delete this object?")) {
       dispatch("deleteObject", selectedObject.id);
@@ -129,313 +102,252 @@
   }
 </script>
 
-<div class="card bg-base-100/10 backdrop-blur-md">
-  <div class="card-body">
-    <h2 class="card-title text-white">
-      {selectedObject ? "✏️ Edit Object" : "✨ Create Object"}
-    </h2>
+<form on:submit|preventDefault={handleSubmit} class="space-y-4">
+  <div class="form-control">
+    <label class="label" for="shape">
+      <span class="label-text">Shape</span>
+    </label>
+    <select id="shape" class="select select-bordered" bind:value={objectForm.shape}>
+      <option value="rectangle">Rectangle</option>
+      <option value="circle">Circle</option>
+      <option value="polygon">Polygon</option>
+    </select>
+  </div>
 
-    <div class="space-y-4">
-      <!-- Basic Properties -->
-      <div class="form-control">
-        <label for="shape-select" class="label">
-          <span class="label-text text-white">Shape</span>
-        </label>
-        <select
-          id="shape-select"
-          class="select select-bordered w-full"
-          bind:value={objectForm.shape}
-        >
-          <option value="rectangle">📦 Rectangle</option>
-          <option value="circle">⭕ Circle</option>
-          <option value="polygon">🔷 Polygon</option>
-        </select>
-      </div>
+  <div class="form-control">
+    <label class="label" for="name">
+      <span class="label-text">Name</span>
+    </label>
+    <input
+      id="name"
+      type="text"
+      placeholder="Object Name"
+      class="input input-bordered"
+      bind:value={objectForm.name}
+    />
+  </div>
 
-      <div class="form-control">
-        <label for="name-input" class="label">
-          <span class="label-text text-white">Name</span>
-        </label>
-        <input
-          id="name-input"
-          type="text"
-          placeholder="Object Name"
-          class="input input-bordered w-full"
-          bind:value={objectForm.name}
-        />
-      </div>
-
-      <div class="form-control">
-        <label for="color-input" class="label">
-          <span class="label-text text-white">Color</span>
-        </label>
-        <input
-          id="color-input"
-          type="color"
-          class="input input-bordered w-full h-12"
-          bind:value={objectForm.color}
-        />
-      </div>
-
-      <div class="form-control">
-        <label for="material-select" class="label">
-          <span class="label-text text-white">Material Preset</span>
-        </label>
-        <select
-          id="material-select"
-          class="select select-bordered w-full"
-          on:change={handleMaterialPresetChange}
-        >
-          <option value="">🎨 Custom</option>
-          {#each Object.keys(MATERIAL_PRESETS) as materialKey}
-            <option value={materialKey}
-              >{MATERIAL_PRESETS[materialKey].name}</option
-            >
-          {/each}
-        </select>
-      </div>
-
-      <!-- Shape-specific dimensions -->
-      {#if objectForm.shape === "circle"}
-        <div class="form-control">
-          <label for="radius-input" class="label">
-            <span class="label-text text-white">Radius</span>
-          </label>
-          <input
-            id="radius-input"
-            type="number"
-            placeholder="Radius"
-            class="input input-bordered w-full"
-            bind:value={objectForm.radius}
-          />
-        </div>
-      {:else}
-        <div class="grid grid-cols-2 gap-4">
-          <div class="form-control">
-            <label for="width-input" class="label">
-              <span class="label-text text-white">Width</span>
-            </label>
-            <input
-              id="width-input"
-              type="number"
-              placeholder="Width"
-              class="input input-bordered w-full"
-              bind:value={objectForm.width}
-            />
-          </div>
-          <div class="form-control">
-            <label for="height-input" class="label">
-              <span class="label-text text-white">Height</span>
-            </label>
-            <input
-              id="height-input"
-              type="number"
-              placeholder="Height"
-              class="input input-bordered w-full"
-              bind:value={objectForm.height}
-            />
-          </div>
-        </div>
-      {/if}
-
-      <!-- Physics Properties -->
-      <div class="grid grid-cols-2 gap-4">
-        <div class="form-control">
-          <label for="mass-input" class="label">
-            <span class="label-text text-white">Mass (kg)</span>
-          </label>
-          <input
-            id="mass-input"
-            type="number"
-            placeholder="Mass"
-            class="input input-bordered w-full"
-            bind:value={objectForm.mass}
-          />
-        </div>
-        <div class="form-control">
-          <label for="density-input" class="label">
-            <span class="label-text text-white">Density</span>
-          </label>
-          <input
-            id="density-input"
-            type="number"
-            placeholder="Density"
-            class="input input-bordered w-full"
-            bind:value={objectForm.density}
-          />
-        </div>
-      </div>
-
-      <!-- Sliders -->
-      <div class="form-control">
-        <label for="friction-range" class="label">
-          <span class="label-text text-white"
-            >Friction: {objectForm.friction}</span
-          >
-        </label>
-        <input
-          id="friction-range"
-          type="range"
-          min="0"
-          max="1"
-          step="0.1"
-          class="range range-primary"
-          bind:value={objectForm.friction}
-        />
-      </div>
-
-      <div class="form-control">
-        <label for="restitution-range" class="label">
-          <span class="label-text text-white"
-            >Elasticity: {objectForm.restitution}</span
-          >
-        </label>
-        <input
-          id="restitution-range"
-          type="range"
-          min="0"
-          max="1"
-          step="0.1"
-          class="range range-primary"
-          bind:value={objectForm.restitution}
-        />
-      </div>
-
-      <div class="form-control">
-        <label for="air-resistance-range" class="label">
-          <span class="label-text text-white"
-            >Air Resistance: {objectForm.airResistance}</span
-          >
-        </label>
-        <input
-          id="air-resistance-range"
-          type="range"
-          min="0"
-          max="0.1"
-          step="0.01"
-          class="range range-primary"
-          bind:value={objectForm.airResistance}
-        />
-      </div>
-
-      <!-- Velocity -->
-      <div class="grid grid-cols-2 gap-4">
-        <div class="form-control">
-          <label for="velocity-x-input" class="label">
-            <span class="label-text text-white">Velocity X</span>
-          </label>
-          <input
-            id="velocity-x-input"
-            type="number"
-            placeholder="VX"
-            class="input input-bordered w-full"
-            bind:value={objectForm.initialVelocityX}
-          />
-        </div>
-        <div class="form-control">
-          <label for="velocity-y-input" class="label">
-            <span class="label-text text-white">Velocity Y</span>
-          </label>
-          <input
-            id="velocity-y-input"
-            type="number"
-            placeholder="VY"
-            class="input input-bordered w-full"
-            bind:value={objectForm.initialVelocityY}
-          />
-        </div>
-      </div>
-
-      <!-- Rotation -->
-      <div class="grid grid-cols-2 gap-4">
-        <div class="form-control">
-          <label for="rotation-input" class="label">
-            <span class="label-text text-white">Rotation (°)</span>
-          </label>
-          <input
-            id="rotation-input"
-            type="number"
-            placeholder="Rotation"
-            class="input input-bordered w-full"
-            bind:value={objectForm.rotation}
-          />
-        </div>
-        <div class="form-control">
-          <label for="angular-velocity-input" class="label">
-            <span class="label-text text-white">Angular Vel.</span>
-          </label>
-          <input
-            id="angular-velocity-input"
-            type="number"
-            placeholder="Angular"
-            class="input input-bordered w-full"
-            bind:value={objectForm.angularVelocity}
-          />
-        </div>
-      </div>
-
-      <!-- Checkboxes -->
-      <div class="form-control">
-        <label class="label cursor-pointer">
-          <span class="label-text text-white">🏔️ Static Object</span>
-          <input
-            type="checkbox"
-            class="toggle toggle-primary"
-            bind:checked={objectForm.isStatic}
-          />
-        </label>
-      </div>
-      <div class="form-control">
-        <label class="label cursor-pointer">
-          <span class="label-text text-white">🕳️ Hollow Object</span>
-          <input
-            type="checkbox"
-            class="toggle toggle-primary"
-            bind:checked={objectForm.isHollow}
-          />
-        </label>
-      </div>
-
-      <!-- Tags -->
-      <div class="form-control">
-        <label for="tags-input" class="label">
-          <span class="label-text text-white">🏷️ Tags (comma-separated)</span>
-        </label>
-        <input
-          id="tags-input"
-          type="text"
-          placeholder="wood, heavy, bouncy"
-          class="input input-bordered w-full"
-          bind:value={objectForm.customTags}
-          on:input={handleCustomTagsChange}
-        />
-      </div>
-
-      <!-- Action Buttons -->
-      {#if selectedObject}
-        <div class="grid grid-cols-2 gap-2">
-          <button class="btn btn-success btn-sm" on:click={handleUpdateObject}>
-            💾 Update
-          </button>
-          <button class="btn btn-error btn-sm" on:click={handleDeleteObject}>
-            🗑️ Delete
-          </button>
-        </div>
-      {:else}
-        <button class="btn btn-success w-full" on:click={handleCreateObject}>
-          ➕ Create Object
-        </button>
-      {/if}
+  <div class="grid grid-cols-2 gap-4">
+    <div class="form-control">
+      <label class="label" for="color">
+        <span class="label-text">Color</span>
+      </label>
+      <input id="color" type="color" class="input input-bordered" bind:value={objectForm.color} />
+    </div>
+    <div class="form-control">
+      <label class="label" for="material">
+        <span class="label-text">Material</span>
+      </label>
+      <select id="material" class="select select-bordered" on:change={handleMaterialPresetChange}>
+        <option value="">Custom</option>
+        {#each Object.entries(MATERIAL_PRESETS) as [key, preset]}
+          <option value={key}>{preset.name}</option>
+        {/each}
+      </select>
     </div>
   </div>
-</div>
 
-<style>
-  .card {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
+  {#if objectForm.shape === 'circle'}
+    <div class="form-control">
+      <label class="label" for="radius">
+        <span class="label-text">Radius</span>
+      </label>
+      <input
+        id="radius"
+        type="number"
+        placeholder="Radius"
+        class="input input-bordered"
+        bind:value={objectForm.radius}
+      />
+    </div>
+  {:else}
+    <div class="grid grid-cols-2 gap-4">
+      <div class="form-control">
+        <label class="label" for="width">
+          <span class="label-text">Width</span>
+        </label>
+        <input
+          id="width"
+          type="number"
+          placeholder="Width"
+          class="input input-bordered"
+          bind:value={objectForm.width}
+        />
+      </div>
+      <div class="form-control">
+        <label class="label" for="height">
+          <span class="label-text">Height</span>
+        </label>
+        <input
+          id="height"
+          type="number"
+          placeholder="Height"
+          class="input input-bordered"
+          bind:value={objectForm.height}
+        />
+      </div>
+    </div>
+  {/if}
 
-  .form-control .label-text {
-    color: rgba(255, 255, 255, 0.9);
-  }
-</style>
+  <div class="grid grid-cols-2 gap-4">
+    <div class="form-control">
+      <label class="label" for="mass">
+        <span class="label-text">Mass (kg)</span>
+      </label>
+      <input
+        id="mass"
+        type="number"
+        placeholder="Mass"
+        class="input input-bordered"
+        bind:value={objectForm.mass}
+      />
+    </div>
+    <div class="form-control">
+      <label class="label" for="density">
+        <span class="label-text">Density</span>
+      </label>
+      <input
+        id="density"
+        type="number"
+        placeholder="Density"
+        class="input input-bordered"
+        bind:value={objectForm.density}
+      />
+    </div>
+  </div>
+
+  <div class="form-control">
+    <label class="label" for="friction">
+      <span class="label-text">Friction: {objectForm.friction}</span>
+    </label>
+    <input
+      id="friction"
+      type="range"
+      min="0"
+      max="1"
+      step="0.1"
+      class="range range-primary"
+      bind:value={objectForm.friction}
+    />
+  </div>
+
+  <div class="form-control">
+    <label class="label" for="restitution">
+      <span class="label-text">Elasticity: {objectForm.restitution}</span>
+    </label>
+    <input
+      id="restitution"
+      type="range"
+      min="0"
+      max="1"
+      step="0.1"
+      class="range range-primary"
+      bind:value={objectForm.restitution}
+    />
+  </div>
+
+  <div class="form-control">
+    <label class="label" for="air-resistance">
+      <span class="label-text">Air Resistance: {objectForm.airResistance}</span>
+    </label>
+    <input
+      id="air-resistance"
+      type="range"
+      min="0"
+      max="0.1"
+      step="0.01"
+      class="range range-primary"
+      bind:value={objectForm.airResistance}
+    />
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div class="form-control">
+      <label class="label" for="velocity-x">
+        <span class="label-text">Velocity X</span>
+      </label>
+      <input
+        id="velocity-x"
+        type="number"
+        placeholder="VX"
+        class="input input-bordered"
+        bind:value={objectForm.initialVelocityX}
+      />
+    </div>
+    <div class="form-control">
+      <label class="label" for="velocity-y">
+        <span class="label-text">Velocity Y</span>
+      </label>
+      <input
+        id="velocity-y"
+        type="number"
+        placeholder="VY"
+        class="input input-bordered"
+        bind:value={objectForm.initialVelocityY}
+      />
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div class="form-control">
+      <label class="label" for="rotation">
+        <span class="label-text">Rotation (°)</span>
+      </label>
+      <input
+        id="rotation"
+        type="number"
+        placeholder="Rotation"
+        class="input input-bordered"
+        bind:value={objectForm.rotation}
+      />
+    </div>
+    <div class="form-control">
+      <label class="label" for="angular-velocity">
+        <span class="label-text">Angular Vel.</span>
+      </label>
+      <input
+        id="angular-velocity"
+        type="number"
+        placeholder="Angular"
+        class="input input-bordered"
+        bind:value={objectForm.angularVelocity}
+      />
+    </div>
+  </div>
+
+  <div class="form-control">
+    <label class="label cursor-pointer" for="is-static">
+      <span class="label-text">Static Object</span>
+      <input id="is-static" type="checkbox" class="toggle toggle-primary" bind:checked={objectForm.isStatic} />
+    </label>
+  </div>
+  <div class="form-control">
+    <label class="label cursor-pointer" for="is-hollow">
+      <span class="label-text">Hollow Object</span>
+      <input id="is-hollow" type="checkbox" class="toggle toggle-primary" bind:checked={objectForm.isHollow} />
+    </label>
+  </div>
+
+  <div class="form-control">
+    <label class="label" for="tags">
+      <span class="label-text">Tags (comma-separated)</span>
+    </label>
+    <input
+      id="tags"
+      type="text"
+      placeholder="wood, heavy, bouncy"
+      class="input input-bordered"
+      bind:value={objectForm.customTags}
+      on:input={handleCustomTagsChange}
+    />
+  </div>
+
+  <div class="card-actions justify-end">
+    {#if selectedObject}
+      <button type="button" class="btn btn-error" on:click={handleDelete}>Delete</button>
+      <button type="submit" class="btn btn-primary">Update</button>
+    {:else}
+      <button type="submit" class="btn btn-primary">Create</button>
+    {/if}
+  </div>
+</form>

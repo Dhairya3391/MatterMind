@@ -405,17 +405,14 @@
   />
 </svelte:head>
 
-<div
-  class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900"
-  in:fade={{ duration: 500 }}
->
+<div class="flex flex-col h-screen bg-base-200" in:fade={{ duration: 500 }}>
   <Header />
 
-  <div class="flex h-[calc(100vh-4rem)]">
+  <div class="flex flex-1 overflow-hidden">
     <Sidebar
-      {activeTab}
+      bind:activeTab
+      bind:objectForm
       {selectedObject}
-      {objectForm}
       on:togglePause={handleTogglePause}
       on:reset={handleReset}
       on:createPresetObjects={createPresetObjects}
@@ -427,9 +424,11 @@
     />
 
     <!-- Main Canvas Area -->
-    <main class="flex-1 flex items-center justify-center p-6">
+    <main
+      class="flex-1 flex items-center justify-center p-4 md:p-6 bg-base-200"
+    >
       <div
-        class="card bg-base-100/10 backdrop-blur-md border border-base-300/20"
+        class="card w-full h-full bg-base-100 shadow-xl border border-base-300"
       >
         <div class="card-body p-0">
           <PhysicsCanvas
@@ -443,16 +442,3 @@
     </main>
   </div>
 </div>
-
-<style>
-  /* Ensure proper backdrop blur support */
-  .backdrop-blur-md {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-
-  /* Card styling */
-  .card {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-</style>

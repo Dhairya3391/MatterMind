@@ -72,138 +72,66 @@
       dispatch(type, event.detail);
     }
   }
-
-  function handleTabClick(tab: string) {
-    activeTab = tab;
-  }
-
-  function handleTabKeydown(event: KeyboardEvent, tab: string) {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      activeTab = tab;
-    }
-  }
 </script>
 
-<aside
-  class="w-80 bg-base-100/10 backdrop-blur-md border-r border-base-300/20 overflow-y-auto"
->
-  <!-- Tab Navigation -->
-  <div class="tabs tabs-boxed bg-base-100/10 m-4" role="tablist">
+<aside class="w-96 bg-base-200 p-4 overflow-y-auto">
+  <div role="tablist" class="tabs tabs-boxed grid grid-cols-3">
     <button
-      type="button"
-      class="tab {activeTab === 'create' ? 'tab-active' : ''}"
       role="tab"
-      aria-selected={activeTab === "create"}
-      aria-controls="create-panel"
-      on:click={() => handleTabClick("create")}
-      on:keydown={(e) => handleTabKeydown(e, "create")}
+      class="tab"
+      class:tab-active={activeTab === 'create'}
+      on:click={() => (activeTab = 'create')}
+      tabindex="0"
     >
-      ✨ Create
+      Create
     </button>
     <button
-      type="button"
-      class="tab {activeTab === 'objects' ? 'tab-active' : ''}"
       role="tab"
-      aria-selected={activeTab === "objects"}
-      aria-controls="objects-panel"
-      on:click={() => handleTabClick("objects")}
-      on:keydown={(e) => handleTabKeydown(e, "objects")}
+      class="tab"
+      class:tab-active={activeTab === 'objects'}
+      on:click={() => (activeTab = 'objects')}
+      tabindex="0"
     >
-      📦 Objects ({$objectsStore.length})
+      Objects ({$objectsStore.length})
     </button>
     <button
-      type="button"
-      class="tab {activeTab === 'settings' ? 'tab-active' : ''}"
       role="tab"
-      aria-selected={activeTab === "settings"}
-      aria-controls="settings-panel"
-      on:click={() => handleTabClick("settings")}
-      on:keydown={(e) => handleTabKeydown(e, "settings")}
+      class="tab"
+      class:tab-active={activeTab === 'settings'}
+      on:click={() => (activeTab = 'settings')}
+      tabindex="0"
     >
-      ⚙️ Settings
+      Settings
     </button>
   </div>
 
-  <!-- Tab Content -->
-  <div class="p-4 space-y-6">
+  <div class="mt-4">
     {#if activeTab === "create"}
-      <div
-        in:fade={{ duration: 200 }}
-        id="create-panel"
-        role="tabpanel"
-        aria-labelledby="create-tab"
-      >
+      <div in:fade={{ duration: 200 }}>
         <SimulationControls
-          on:togglePause={handleSimulationEvent}
-          on:reset={handleSimulationEvent}
-          on:createPresetObjects={handleSimulationEvent}
-          on:toggleGravity={handleSimulationEvent}
-          on:toggleVectors={handleSimulationEvent}
+          on:togglePause
+          on:reset
+          on:createPresetObjects
+          on:toggleGravity
+          on:toggleVectors
         />
+        <div class="divider"></div>
         <ObjectForm
+          bind:objectForm
           {selectedObject}
-          {objectForm}
-          on:createObject={handleObjectFormEvent}
-          on:updateObject={handleObjectFormEvent}
-          on:deleteObject={handleObjectFormEvent}
+          on:createObject
+          on:updateObject
+          on:deleteObject
         />
       </div>
     {:else if activeTab === "objects"}
-      <div
-        in:fade={{ duration: 200 }}
-        id="objects-panel"
-        role="tabpanel"
-        aria-labelledby="objects-tab"
-      >
+      <div in:fade={{ duration: 200 }}>
         <ObjectsList />
       </div>
     {:else if activeTab === "settings"}
-      <div
-        in:fade={{ duration: 200 }}
-        id="settings-panel"
-        role="tabpanel"
-        aria-labelledby="settings-tab"
-      >
+      <div in:fade={{ duration: 200 }}>
         <SettingsPanel />
       </div>
     {/if}
   </div>
 </aside>
-
-<style>
-  /* Custom scrollbar styling */
-  aside::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  aside::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
-  }
-
-  aside::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 3px;
-  }
-
-  aside::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.5);
-  }
-
-  /* Custom tab styling */
-  .tabs-boxed .tab {
-    color: rgba(255, 255, 255, 0.7);
-    transition: all 0.3s ease;
-  }
-
-  .tabs-boxed .tab:hover {
-    color: white;
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  .tabs-boxed .tab-active {
-    color: white;
-    background: rgba(59, 130, 246, 0.5);
-  }
-</style>
