@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MatterMind - Interactive Physics Simulation</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h2>MatterMind</h2>
+          <p>Interactive Physics Simulation</p>
+        </div>
+
+        <!-- Simulation Controls -->
+        <div class="control-section">
+          <h3>Simulation</h3>
+          <div class="control-group">
+            <button id="playPauseBtn" class="btn btn-primary">⏸️ Pause</button>
+            <button id="resetBtn" class="btn btn-secondary">🔄 Reset</button>
+          </div>
+          <div class="control-group">
+            <label>
+              <input type="checkbox" id="gravityToggle" checked />
+              Gravity
+            </label>
+          </div>
+        </div>
+
+        <!-- Object Creation -->
+        <div class="control-section">
+          <h3>Create Object</h3>
+          <div class="control-group">
+            <label for="shapeSelect">Shape:</label>
+            <select id="shapeSelect">
+              <option value="rectangle">Rectangle</option>
+              <option value="circle">Circle</option>
+              <option value="polygon">Polygon</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="objectName">Name:</label>
+            <input type="text" id="objectName" placeholder="Object name" />
+          </div>
+
+          <div class="control-group">
+            <label for="objectColor">Color:</label>
+            <input type="color" id="objectColor" value="#4CAF50" />
+          </div>
+
+          <div class="control-group dimensions-group">
+            <label for="objectWidth">Width:</label>
+            <input
+              type="number"
+              id="objectWidth"
+              value="50"
+              min="10"
+              max="200"
+            />
+
+            <label for="objectHeight">Height:</label>
+            <input
+              type="number"
+              id="objectHeight"
+              value="50"
+              min="10"
+              max="200"
+            />
+          </div>
+
+          <div class="control-group radius-group" style="display: none">
+            <label for="objectRadius">Radius:</label>
+            <input
+              type="number"
+              id="objectRadius"
+              value="25"
+              min="5"
+              max="100"
+            />
+          </div>
+
+          <div class="control-group">
+            <label for="objectMass">Mass (kg):</label>
+            <input
+              type="number"
+              id="objectMass"
+              value="1"
+              min="0.1"
+              max="100"
+              step="0.1"
+            />
+          </div>
+
+          <div class="control-group">
+            <label for="objectFriction">Friction:</label>
+            <input
+              type="range"
+              id="objectFriction"
+              min="0"
+              max="1"
+              step="0.1"
+              value="0.1"
+            />
+            <span id="frictionValue">0.1</span>
+          </div>
+
+          <div class="control-group">
+            <label for="objectElasticity">Elasticity:</label>
+            <input
+              type="range"
+              id="objectElasticity"
+              min="0"
+              max="1"
+              step="0.1"
+              value="0.5"
+            />
+            <span id="elasticityValue">0.5</span>
+          </div>
+
+          <div class="control-group">
+            <label for="objectAirResistance">Air Resistance:</label>
+            <input
+              type="range"
+              id="objectAirResistance"
+              min="0"
+              max="0.1"
+              step="0.01"
+              value="0"
+            />
+            <span id="airResistanceValue">0</span>
+          </div>
+
+          <div class="control-group">
+            <label for="objectRotation">Rotation (deg):</label>
+            <input
+              type="number"
+              id="objectRotation"
+              value="0"
+              min="0"
+              max="360"
+            />
+          </div>
+
+          <div class="control-group">
+            <label for="objectAngularVelocity">Angular Velocity:</label>
+            <input
+              type="number"
+              id="objectAngularVelocity"
+              value="0"
+              step="0.1"
+            />
+          </div>
+
+          <div class="control-group">
+            <label>
+              <input type="checkbox" id="objectStatic" />
+              Static Object
+            </label>
+          </div>
+
+          <div class="control-group">
+            <label>
+              <input type="checkbox" id="showVectors" />
+              Show Vectors
+            </label>
+          </div>
+
+          <button id="createObjectBtn" class="btn btn-success">
+            ➕ Create Object
+          </button>
+        </div>
+
+        <!-- Object List -->
+        <div class="control-section">
+          <h3>Objects</h3>
+          <div id="objectList" class="object-list">
+            <!-- Objects will be listed here -->
+          </div>
+        </div>
+
+        <!-- Scene Management -->
+        <div class="control-section">
+          <h3>Scene</h3>
+          <div class="control-group">
+            <button id="saveSceneBtn" class="btn btn-secondary">
+              💾 Save Scene
+            </button>
+            <button id="loadSceneBtn" class="btn btn-secondary">
+              📂 Load Scene
+            </button>
+          </div>
+          <div class="control-group">
+            <button id="clearSceneBtn" class="btn btn-danger">
+              🗑️ Clear All
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Canvas Area -->
+      <div class="canvas-container">
+        <canvas id="physicsCanvas"></canvas>
+        <div class="canvas-overlay">
+          <div class="info-panel">
+            <span id="objectCount">Objects: 0</span>
+            <span id="fps">FPS: 60</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden file input for loading scenes -->
+    <input type="file" id="fileInput" accept=".json" style="display: none" />
+
+    <script src="js/physics-engine.js"></script>
+    <script src="js/ui-controller.js"></script>
+    <script src="js/object-manager.js"></script>
+    <script src="js/scene-manager.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>

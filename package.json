@@ -1,0 +1,41 @@
+{
+  "name": "mattermind",
+  "version": "1.0.0",
+  "description": "Interactive Physics Simulation Platform using Matter.js",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "dev": "python3 -m http.server 8000",
+    "serve": "python3 -m http.server 8000"
+  },
+  "keywords": [
+    "physics",
+    "simulation",
+    "matter.js",
+    "canvas",
+    "interactive",
+    "education",
+    "2d",
+    "javascript"
+  ],
+  "author": "Dhairya Adroja and Harpalsinh Sindhav",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/mattermind.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/mattermind/issues"
+  },
+  "homepage": "https://github.com/yourusername/mattermind#readme",
+  "devDependencies": {},
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+} 
