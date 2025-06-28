@@ -1,5 +1,10 @@
-import { writable, derived } from 'svelte/store';
-import type { PhysicsState, PhysicsObject, ObjectConfig, SceneData } from '$lib/types/physics.types';
+import { writable, derived } from "svelte/store";
+import type {
+  PhysicsState,
+  PhysicsObject,
+  ObjectConfig,
+  SceneData,
+} from "$lib/types/physics.types";
 
 // Create the main physics state store
 function createPhysicsStore() {
@@ -8,7 +13,7 @@ function createPhysicsStore() {
     gravity: true,
     showVectors: false,
     fps: 60,
-    objectCount: 0
+    objectCount: 0,
   };
 
   const { subscribe, set, update } = writable<PhysicsState>(initialState);
@@ -17,17 +22,24 @@ function createPhysicsStore() {
     subscribe,
     set,
     update,
-    
+
     // Actions
-    toggleRunning: () => update(state => ({ ...state, isRunning: !state.isRunning })),
-    setRunning: (isRunning: boolean) => update(state => ({ ...state, isRunning })),
-    toggleGravity: () => update(state => ({ ...state, gravity: !state.gravity })),
-    setGravity: (gravity: boolean) => update(state => ({ ...state, gravity })),
-    toggleVectors: () => update(state => ({ ...state, showVectors: !state.showVectors })),
-    setVectors: (showVectors: boolean) => update(state => ({ ...state, showVectors })),
-    setFPS: (fps: number) => update(state => ({ ...state, fps })),
-    setObjectCount: (objectCount: number) => update(state => ({ ...state, objectCount })),
-    reset: () => set(initialState)
+    toggleRunning: () =>
+      update((state) => ({ ...state, isRunning: !state.isRunning })),
+    setRunning: (isRunning: boolean) =>
+      update((state) => ({ ...state, isRunning })),
+    toggleGravity: () =>
+      update((state) => ({ ...state, gravity: !state.gravity })),
+    setGravity: (gravity: boolean) =>
+      update((state) => ({ ...state, gravity })),
+    toggleVectors: () =>
+      update((state) => ({ ...state, showVectors: !state.showVectors })),
+    setVectors: (showVectors: boolean) =>
+      update((state) => ({ ...state, showVectors })),
+    setFPS: (fps: number) => update((state) => ({ ...state, fps })),
+    setObjectCount: (objectCount: number) =>
+      update((state) => ({ ...state, objectCount })),
+    reset: () => set(initialState),
   };
 }
 
@@ -39,22 +51,28 @@ function createObjectsStore() {
     subscribe,
     set,
     update,
-    
+
     // Actions
-    addObject: (object: PhysicsObject) => update(objects => [...objects, object]),
-    updateObject: (id: number, updates: Partial<PhysicsObject>) => 
-      update(objects => objects.map(obj => obj.id === id ? { ...obj, ...updates } : obj)),
-    removeObject: (id: number) => update(objects => objects.filter(obj => obj.id !== id)),
-    selectObject: (id: number | null) => 
-      update(objects => objects.map(obj => ({ ...obj, selected: obj.id === id }))),
+    addObject: (object: PhysicsObject) =>
+      update((objects) => [...objects, object]),
+    updateObject: (id: number, updates: Partial<PhysicsObject>) =>
+      update((objects) =>
+        objects.map((obj) => (obj.id === id ? { ...obj, ...updates } : obj)),
+      ),
+    removeObject: (id: number) =>
+      update((objects) => objects.filter((obj) => obj.id !== id)),
+    selectObject: (id: number | null) =>
+      update((objects) =>
+        objects.map((obj) => ({ ...obj, selected: obj.id === id })),
+      ),
     clearObjects: () => set([]),
     getObject: (id: number) => {
       let result: PhysicsObject | undefined;
-      subscribe(objects => {
-        result = objects.find(obj => obj.id === id);
+      subscribe((objects) => {
+        result = objects.find((obj) => obj.id === id);
       })();
       return result;
-    }
+    },
   };
 }
 
@@ -65,7 +83,7 @@ function createSelectedObjectStore() {
   return {
     subscribe,
     set,
-    clear: () => set(null)
+    clear: () => set(null),
   };
 }
 
@@ -77,12 +95,12 @@ function createSceneStore() {
     subscribe,
     set,
     update,
-    
+
     // Actions
     loadScene: (scene: SceneData) => set(scene),
-    updateScene: (updates: Partial<SceneData>) => 
-      update(scene => scene ? { ...scene, ...updates } : null),
-    clearScene: () => set(null)
+    updateScene: (updates: Partial<SceneData>) =>
+      update((scene) => (scene ? { ...scene, ...updates } : null)),
+    clearScene: () => set(null),
   };
 }
 
@@ -93,21 +111,33 @@ export const selectedObjectStore = createSelectedObjectStore();
 export const sceneStore = createSceneStore();
 
 // Derived stores
-export const isRunning = derived(physicsStore, ($physics) => $physics.isRunning);
+export const isRunning = derived(
+  physicsStore,
+  ($physics) => $physics.isRunning,
+);
 export const gravity = derived(physicsStore, ($physics) => $physics.gravity);
-export const showVectors = derived(physicsStore, ($physics) => $physics.showVectors);
+export const showVectors = derived(
+  physicsStore,
+  ($physics) => $physics.showVectors,
+);
 export const fps = derived(physicsStore, ($physics) => $physics.fps);
-export const objectCount = derived(physicsStore, ($physics) => $physics.objectCount);
-
-export const staticObjects = derived(objectsStore, ($objects) => 
-  $objects.filter(obj => obj.config.isStatic)
+export const objectCount = derived(
+  physicsStore,
+  ($physics) => $physics.objectCount,
 );
 
-export const dynamicObjects = derived(objectsStore, ($objects) => 
-  $objects.filter(obj => !obj.config.isStatic)
+export const staticObjects = derived(objectsStore, ($objects) =>
+  $objects.filter((obj) => obj.config.isStatic),
 );
 
-export const selectedObject = derived(selectedObjectStore, ($selected) => $selected);
+export const dynamicObjects = derived(objectsStore, ($objects) =>
+  $objects.filter((obj) => !obj.config.isStatic),
+);
+
+export const selectedObject = derived(
+  selectedObjectStore,
+  ($selected) => $selected,
+);
 
 // Combined app state store
 export const appState = derived(
@@ -116,6 +146,6 @@ export const appState = derived(
     physics: $physics,
     objects: $objects,
     selectedObject: $selected,
-    scene: $scene
-  })
-); 
+    scene: $scene,
+  }),
+);

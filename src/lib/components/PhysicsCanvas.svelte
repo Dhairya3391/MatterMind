@@ -17,7 +17,7 @@
   // Component state
   let canvas: HTMLCanvasElement;
   let physicsEngine: PhysicsEngine;
-  let animationFrameId: number;
+  let animationFrameId: number | null = null;
 
   // Reactive statements
   $: if (physicsEngine && showVectors !== undefined) {
@@ -53,6 +53,11 @@
       physicsStore.setRunning(true);
       physicsStore.setVectors(showVectors);
 
+      // Expose the physics engine globally for the parent component
+      if (typeof window !== "undefined") {
+        (window as any).matterMindPhysicsEngine = physicsEngine;
+      }
+
       console.log("✅ Physics engine initialized successfully");
     } catch (error) {
       console.error("❌ Failed to initialize physics engine:", error);
@@ -82,6 +87,10 @@
     }
     if (animationFrameId) {
       cancelAnimationFrame(animationFrameId);
+    }
+    // Clean up global reference
+    if (typeof window !== "undefined") {
+      delete (window as any).matterMindPhysicsEngine;
     }
   }
 
@@ -164,7 +173,7 @@
     {width}
     {height}
     class="physics-canvas"
-  />
+  ></canvas>
 
   <div class="canvas-overlay">
     <div class="info-panel">

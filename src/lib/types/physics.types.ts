@@ -1,4 +1,4 @@
-import type { Body } from 'matter-js';
+import type { Body } from "matter-js";
 
 // Physics object types
 export interface PhysicsObject {
@@ -12,7 +12,7 @@ export interface PhysicsObject {
 }
 
 export interface ObjectConfig {
-  shape: 'rectangle' | 'circle' | 'polygon';
+  shape: "rectangle" | "circle" | "polygon";
   width?: number;
   height?: number;
   radius?: number;
@@ -33,6 +33,9 @@ export interface ObjectConfig {
   // Material properties
   material?: string;
   tags?: string[];
+  // Visual properties
+  name?: string;
+  color?: string;
 }
 
 export interface PhysicsState {
@@ -120,43 +123,43 @@ export interface MaterialPreset {
 
 export const MATERIAL_PRESETS: Record<string, MaterialPreset> = {
   wood: {
-    name: 'Wood',
+    name: "Wood",
     density: 600,
     friction: 0.3,
     restitution: 0.2,
-    color: '#8B4513',
-    tags: ['wood', 'natural']
+    color: "#8B4513",
+    tags: ["wood", "natural"],
   },
   metal: {
-    name: 'Metal',
+    name: "Metal",
     density: 7800,
     friction: 0.1,
     restitution: 0.8,
-    color: '#C0C0C0',
-    tags: ['metal', 'conductive']
+    color: "#C0C0C0",
+    tags: ["metal", "conductive"],
   },
   rubber: {
-    name: 'Rubber',
+    name: "Rubber",
     density: 1200,
     friction: 0.8,
     restitution: 0.9,
-    color: '#000000',
-    tags: ['rubber', 'elastic']
+    color: "#000000",
+    tags: ["rubber", "elastic"],
   },
   plastic: {
-    name: 'Plastic',
+    name: "Plastic",
     density: 900,
     friction: 0.2,
     restitution: 0.5,
-    color: '#FF6B6B',
-    tags: ['plastic', 'synthetic']
+    color: "#FF6B6B",
+    tags: ["plastic", "synthetic"],
   },
   stone: {
-    name: 'Stone',
+    name: "Stone",
     density: 2700,
     friction: 0.6,
     restitution: 0.1,
-    color: '#696969',
-    tags: ['stone', 'natural']
-  }
-}; 
+    color: "#696969",
+    tags: ["stone", "natural"],
+  },
+};

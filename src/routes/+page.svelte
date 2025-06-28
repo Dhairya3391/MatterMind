@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { fade, fly } from "svelte/transition";
   import PhysicsCanvas from "$lib/components/PhysicsCanvas.svelte";
   import {
     physicsStore,
@@ -7,9 +8,12 @@
     selectedObjectStore,
   } from "$lib/stores/physics.store";
   import type { ObjectConfig, PhysicsObject } from "$lib/types/physics.types";
+  import { MATERIAL_PRESETS } from "$lib/types/physics.types";
+  import { PhysicsEngine } from "$lib/physics/physics-engine";
 
   // Component state
   let selectedObject: PhysicsObject | null = null;
+  let physicsEngine: PhysicsEngine | null = null;
   let objectForm = {
     shape: "rectangle",
     name: "",
@@ -18,19 +22,43 @@
     height: 50,
     radius: 25,
     mass: 1,
+    density: 0,
     friction: 0.1,
     restitution: 0.5,
     airResistance: 0,
     rotation: 0,
     angularVelocity: 0,
     isStatic: false,
+    isHollow: false,
+    initialVelocityX: 0,
+    initialVelocityY: 0,
+    material: "",
+    tags: [] as string[],
+    customTags: "",
   };
 
   // Reactive statements
   $: selectedObject = $selectedObjectStore;
 
+  // Update preview when form changes (only when not editing an existing object)
+  $: if (!selectedObject && physicsEngine && objectForm) {
+    // Use setTimeout to avoid infinite loops
+    setTimeout(() => updatePreview(), 0);
+  }
+
   onMount(() => {
     console.log("🧠 MatterMind Svelte initialized");
+    // Get the physics engine from the global reference
+    const checkForEngine = () => {
+      if ((window as any).matterMindPhysicsEngine) {
+        physicsEngine = (window as any).matterMindPhysicsEngine;
+        console.log("✅ Physics engine connected to main page");
+        setTimeout(() => updatePreview(), 100);
+      } else {
+        setTimeout(checkForEngine, 100);
+      }
+    };
+    checkForEngine();
   });
 
   // Event handlers
@@ -45,58 +73,89 @@
     } else {
       selectedObjectStore.clear();
       clearForm();
+      setTimeout(() => updatePreview(), 0);
     }
   }
 
   function handleCreateObject(): void {
+    if (!physicsEngine) return;
+
+    // Place objects in the visible area of the canvas
+    const center = { x: 400, y: 200 }; // Fixed position in visible area
     const config: ObjectConfig = {
       shape: objectForm.shape as "rectangle" | "circle" | "polygon",
       name: objectForm.name || `Object ${Date.now()}`,
-      color: objectForm.color,
-      x: 400, // Center of canvas
-      y: 100,
+      color: objectForm.color.startsWith("#") ? objectForm.color : "#4CAF50",
+      x: center.x,
+      y: center.y,
       mass: objectForm.mass,
+      density: objectForm.density || undefined,
       friction: objectForm.friction,
       restitution: objectForm.restitution,
       airResistance: objectForm.airResistance,
       rotation: objectForm.rotation,
       angularVelocity: objectForm.angularVelocity,
       isStatic: objectForm.isStatic,
-      ...(objectForm.shape === "circle"
-        ? { radius: objectForm.radius }
-        : {
-            width: objectForm.width,
-            height: objectForm.height,
-          }),
+      isHollow: objectForm.isHollow,
+      initialVelocityX: objectForm.initialVelocityX,
+      initialVelocityY: objectForm.initialVelocityY,
+      material: objectForm.material || undefined,
+      tags: objectForm.tags,
+      // Add shape-specific properties
+      ...(objectForm.shape === "circle" && { radius: objectForm.radius }),
+      ...(objectForm.shape === "rectangle" && {
+        width: objectForm.width,
+        height: objectForm.height,
+      }),
+      ...(objectForm.shape === "polygon" && { radius: objectForm.radius }),
     };
 
-    // Add to store (in a real app, this would create the physics object)
-    const newObject: PhysicsObject = {
-      id: Date.now(),
-      name: config.name,
-      color: config.color,
-      config,
-      selected: false,
-    };
+    console.log("Creating object with config:", config);
+    // Create the physics object
+    const body = physicsEngine.createObject(config);
+    if (body) {
+      console.log("Object created successfully:", body.id);
+      // Add to store
+      const newObject: PhysicsObject = {
+        id: body.id,
+        name: config.name || `Object ${body.id}`,
+        color: config.color || "#4CAF50",
+        config,
+        selected: false,
+        material: config.material,
+        tags: config.tags,
+      };
 
-    objectsStore.addObject(newObject);
-    clearForm();
+      objectsStore.addObject(newObject);
+      clearForm();
+      clearPreview();
+      // Show preview again after creation
+      setTimeout(() => updatePreview(), 100);
+    } else {
+      console.error("Failed to create object");
+    }
   }
 
   function handleUpdateObject(): void {
-    if (!selectedObject) return;
+    if (!selectedObject || !physicsEngine) return;
 
     const config: ObjectConfig = {
       ...selectedObject.config,
       name: objectForm.name,
-      color: objectForm.color,
+      color: objectForm.color.startsWith("#") ? objectForm.color : "#4CAF50",
       mass: objectForm.mass,
+      density: objectForm.density || undefined,
       friction: objectForm.friction,
       restitution: objectForm.restitution,
       airResistance: objectForm.airResistance,
       rotation: objectForm.rotation,
       angularVelocity: objectForm.angularVelocity,
       isStatic: objectForm.isStatic,
+      isHollow: objectForm.isHollow,
+      initialVelocityX: objectForm.initialVelocityX,
+      initialVelocityY: objectForm.initialVelocityY,
+      material: objectForm.material || undefined,
+      tags: objectForm.tags,
       ...(objectForm.shape === "circle"
         ? { radius: objectForm.radius }
         : {
@@ -105,14 +164,19 @@
           }),
     };
 
+    // Update the physics object
+    physicsEngine.updateObject(selectedObject.id, config);
+
+    // Update the store
     objectsStore.updateObject(selectedObject.id, { config });
     clearForm();
   }
 
   function handleDeleteObject(): void {
-    if (!selectedObject) return;
+    if (!selectedObject || !physicsEngine) return;
 
     if (confirm("Are you sure you want to delete this object?")) {
+      physicsEngine.deleteObject(selectedObject.id);
       objectsStore.removeObject(selectedObject.id);
       selectedObjectStore.clear();
       clearForm();
@@ -120,19 +184,33 @@
   }
 
   function handleTogglePause(): void {
-    physicsStore.toggleRunning();
+    if (physicsEngine) {
+      const isRunning = physicsEngine.togglePause();
+      physicsStore.setRunning(isRunning);
+    }
   }
 
   function handleToggleGravity(): void {
-    physicsStore.toggleGravity();
+    if (physicsEngine) {
+      const currentGravity = $physicsStore.gravity;
+      physicsEngine.setGravity(!currentGravity);
+      physicsStore.setGravity(!currentGravity);
+    }
   }
 
   function handleToggleVectors(): void {
-    physicsStore.toggleVectors();
+    if (physicsEngine) {
+      const currentVectors = $physicsStore.showVectors;
+      physicsEngine.setShowVectors(!currentVectors);
+      physicsStore.setVectors(!currentVectors);
+    }
   }
 
   function handleReset(): void {
     if (confirm("Are you sure you want to reset the simulation?")) {
+      if (physicsEngine) {
+        physicsEngine.reset();
+      }
       physicsStore.reset();
       objectsStore.clearObjects();
       selectedObjectStore.clear();
@@ -140,7 +218,30 @@
     }
   }
 
+  function handleMaterialPresetChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const materialKey = select.value;
+
+    if (materialKey && MATERIAL_PRESETS[materialKey]) {
+      const preset = MATERIAL_PRESETS[materialKey];
+      objectForm.material = materialKey;
+      objectForm.density = preset.density;
+      objectForm.friction = preset.friction;
+      objectForm.restitution = preset.restitution;
+      objectForm.color = preset.color;
+      objectForm.tags = [...preset.tags];
+    }
+  }
+
+  function handleCustomTagsChange(): void {
+    objectForm.tags = objectForm.customTags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
+  }
+
   function populateForm(object: PhysicsObject): void {
+    clearPreview();
     objectForm = {
       shape: object.config.shape,
       name: object.name,
@@ -149,16 +250,24 @@
       height: object.config.height || 50,
       radius: object.config.radius || 25,
       mass: object.config.mass,
+      density: object.config.density || 0,
       friction: object.config.friction,
       restitution: object.config.restitution,
       airResistance: object.config.airResistance,
       rotation: object.config.rotation,
       angularVelocity: object.config.angularVelocity,
       isStatic: object.config.isStatic,
+      isHollow: object.config.isHollow || false,
+      initialVelocityX: object.config.initialVelocityX,
+      initialVelocityY: object.config.initialVelocityY,
+      material: object.material || "",
+      tags: object.tags || [],
+      customTags: (object.tags || []).join(", "),
     };
   }
 
   function clearForm(): void {
+    clearPreview();
     objectForm = {
       shape: "rectangle",
       name: "",
@@ -167,13 +276,181 @@
       height: 50,
       radius: 25,
       mass: 1,
+      density: 0,
       friction: 0.1,
       restitution: 0.5,
       airResistance: 0,
       rotation: 0,
       angularVelocity: 0,
       isStatic: false,
+      isHollow: false,
+      initialVelocityX: 0,
+      initialVelocityY: 0,
+      material: "",
+      tags: [],
+      customTags: "",
     };
+  }
+
+  function onPhysicsEngineReady(engine: PhysicsEngine): void {
+    physicsEngine = engine;
+  }
+
+  function updatePreview(): void {
+    if (!physicsEngine) return;
+
+    // Show preview in the visible area of the canvas
+    const center = { x: 400, y: 200 }; // Fixed position in visible area
+    const previewConfig: ObjectConfig = {
+      shape: objectForm.shape as "rectangle" | "circle" | "polygon",
+      name: objectForm.name || "Preview Object",
+      color: objectForm.color.startsWith("#") ? objectForm.color : "#4CAF50",
+      x: center.x,
+      y: center.y,
+      mass: objectForm.mass,
+      density: objectForm.density || undefined,
+      friction: objectForm.friction,
+      restitution: objectForm.restitution,
+      airResistance: objectForm.airResistance,
+      rotation: objectForm.rotation,
+      angularVelocity: objectForm.angularVelocity,
+      isStatic: objectForm.isStatic,
+      isHollow: objectForm.isHollow,
+      initialVelocityX: objectForm.initialVelocityX,
+      initialVelocityY: objectForm.initialVelocityY,
+      material: objectForm.material || undefined,
+      tags: objectForm.tags,
+      // Add shape-specific properties
+      ...(objectForm.shape === "circle" && { radius: objectForm.radius }),
+      ...(objectForm.shape === "rectangle" && {
+        width: objectForm.width,
+        height: objectForm.height,
+      }),
+      ...(objectForm.shape === "polygon" && { radius: objectForm.radius }),
+    };
+
+    console.log("Setting preview object:", previewConfig);
+    physicsEngine.setPreviewObject(previewConfig);
+  }
+
+  function clearPreview(): void {
+    if (physicsEngine) {
+      physicsEngine.setPreviewObject(null);
+    }
+  }
+
+  function createPresetObjects(): void {
+    if (!physicsEngine) return;
+
+    // Create a ground platform
+    const groundConfig: ObjectConfig = {
+      shape: "rectangle",
+      name: "Ground",
+      color: "#8B4513",
+      width: 800,
+      height: 20,
+      x: 400,
+      y: 550,
+      mass: 1000,
+      friction: 0.3,
+      restitution: 0.2,
+      airResistance: 0,
+      rotation: 0,
+      angularVelocity: 0,
+      isStatic: true,
+      isHollow: false,
+      initialVelocityX: 0,
+      initialVelocityY: 0,
+      material: "wood",
+      tags: ["ground", "wood"],
+    };
+
+    const groundBody = physicsEngine.createObject(groundConfig);
+    if (groundBody) {
+      const groundObject: PhysicsObject = {
+        id: groundBody.id,
+        name: groundConfig.name!,
+        color: groundConfig.color || "#8B4513",
+        config: groundConfig,
+        selected: false,
+        material: groundConfig.material,
+        tags: groundConfig.tags,
+      };
+      objectsStore.addObject(groundObject);
+    }
+
+    // Create a bouncing ball
+    const ballConfig: ObjectConfig = {
+      shape: "circle",
+      name: "Bouncy Ball",
+      color: "#FF6B6B",
+      radius: 25,
+      x: 300,
+      y: 150,
+      mass: 1,
+      friction: 0.1,
+      restitution: 0.9,
+      airResistance: 0.01,
+      rotation: 0,
+      angularVelocity: 0,
+      isStatic: false,
+      isHollow: false,
+      initialVelocityX: 5,
+      initialVelocityY: 0,
+      material: "rubber",
+      tags: ["ball", "rubber", "bouncy"],
+    };
+
+    const ballBody = physicsEngine.createObject(ballConfig);
+    if (ballBody) {
+      const ballObject: PhysicsObject = {
+        id: ballBody.id,
+        name: ballConfig.name!,
+        color: ballConfig.color || "#FF6B6B",
+        config: ballConfig,
+        selected: false,
+        material: ballConfig.material,
+        tags: ballConfig.tags,
+      };
+      objectsStore.addObject(ballObject);
+    }
+
+    // Create a heavy block
+    const blockConfig: ObjectConfig = {
+      shape: "rectangle",
+      name: "Heavy Block",
+      color: "#C0C0C0",
+      width: 60,
+      height: 60,
+      x: 500,
+      y: 100,
+      mass: 10,
+      friction: 0.2,
+      restitution: 0.3,
+      airResistance: 0,
+      rotation: 0,
+      angularVelocity: 0,
+      isStatic: false,
+      isHollow: false,
+      initialVelocityX: 0,
+      initialVelocityY: 0,
+      material: "metal",
+      tags: ["block", "metal", "heavy"],
+    };
+
+    const blockBody = physicsEngine.createObject(blockConfig);
+    if (blockBody) {
+      const blockObject: PhysicsObject = {
+        id: blockBody.id,
+        name: blockConfig.name!,
+        color: blockConfig.color || "#C0C0C0",
+        config: blockConfig,
+        selected: false,
+        material: blockConfig.material,
+        tags: blockConfig.tags,
+      };
+      objectsStore.addObject(blockObject);
+    }
   }
 </script>
 
@@ -185,498 +462,344 @@
   />
 </svelte:head>
 
-<div class="app-container">
+<div class="flex h-screen bg-gray-900 text-white" in:fade={{ duration: 500 }}>
   <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <h2>MatterMind</h2>
-      <p>Interactive Physics Simulation</p>
+  <aside class="w-96 bg-gray-800 p-6 overflow-y-auto">
+    <div class="flex items-center justify-between mb-8">
+      <h1 class="text-3xl font-bold">MatterMind</h1>
+      <div class="flex items-center space-x-2">
+        <button class="btn btn-ghost btn-circle" aria-label="Search">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            ><path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            /></svg
+          >
+        </button>
+        <button class="btn btn-ghost btn-circle" aria-label="Notifications">
+          <div class="indicator">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+              /></svg
+            >
+            <span class="badge badge-xs badge-primary indicator-item"></span>
+          </div>
+        </button>
+      </div>
     </div>
 
     <!-- Simulation Controls -->
-    <div class="control-section">
-      <h3>Simulation</h3>
-      <div class="control-group">
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">Simulation</h2>
+      <div class="grid grid-cols-2 gap-4">
         <button class="btn btn-primary" on:click={handleTogglePause}>
           {$physicsStore.isRunning ? "⏸️ Pause" : "▶️ Play"}
         </button>
         <button class="btn btn-secondary" on:click={handleReset}>
           🔄 Reset
         </button>
+        <button class="btn btn-info col-span-2" on:click={createPresetObjects}>
+          🎯 Create Preset Objects
+        </button>
       </div>
-      <div class="control-group">
-        <label>
+      <div class="form-control mt-4">
+        <label class="label cursor-pointer">
+          <span class="label-text text-white">Gravity</span>
           <input
             type="checkbox"
+            class="toggle toggle-primary"
             bind:checked={$physicsStore.gravity}
             on:change={handleToggleGravity}
           />
-          Gravity
         </label>
       </div>
-      <div class="control-group">
-        <label>
+      <div class="form-control">
+        <label class="label cursor-pointer">
+          <span class="label-text text-white">Show Vectors</span>
           <input
             type="checkbox"
+            class="toggle toggle-primary"
             bind:checked={$physicsStore.showVectors}
             on:change={handleToggleVectors}
           />
-          Show Vectors
         </label>
       </div>
     </div>
 
     <!-- Object Creation/Editing -->
-    <div class="control-section">
-      <h3>{selectedObject ? "Edit Object" : "Create Object"}</h3>
-
-      <div class="control-group">
-        <label for="shapeSelect">Shape:</label>
-        <select id="shapeSelect" bind:value={objectForm.shape}>
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">
+        {selectedObject ? "Edit Object" : "Create Object"}
+      </h2>
+      <div class="space-y-4">
+        <select
+          class="select select-bordered w-full"
+          bind:value={objectForm.shape}
+        >
           <option value="rectangle">Rectangle</option>
           <option value="circle">Circle</option>
           <option value="polygon">Polygon</option>
         </select>
-      </div>
-
-      <div class="control-group">
-        <label for="objectName">Name:</label>
         <input
           type="text"
-          id="objectName"
+          placeholder="Object Name"
+          class="input input-bordered w-full"
           bind:value={objectForm.name}
-          placeholder="Object name"
         />
-      </div>
+        <input
+          type="color"
+          class="input input-bordered w-full"
+          bind:value={objectForm.color}
+        />
+        <select
+          class="select select-bordered w-full"
+          on:change={handleMaterialPresetChange}
+        >
+          <option value="">Custom</option>
+          {#each Object.keys(MATERIAL_PRESETS) as materialKey}
+            <option value={materialKey}
+              >{MATERIAL_PRESETS[materialKey].name}</option
+            >
+          {/each}
+        </select>
 
-      <div class="control-group">
-        <label for="objectColor">Color:</label>
-        <input type="color" id="objectColor" bind:value={objectForm.color} />
-      </div>
-
-      {#if objectForm.shape === "circle"}
-        <div class="control-group">
-          <label for="objectRadius">Radius:</label>
+        {#if objectForm.shape === "circle"}
           <input
             type="number"
-            id="objectRadius"
+            placeholder="Radius"
+            class="input input-bordered w-full"
             bind:value={objectForm.radius}
-            min="5"
-            max="100"
           />
-        </div>
-      {:else}
-        <div class="control-group">
-          <label for="objectWidth">Width:</label>
+        {:else}
+          <div class="grid grid-cols-2 gap-4">
+            <input
+              type="number"
+              placeholder="Width"
+              class="input input-bordered w-full"
+              bind:value={objectForm.width}
+            />
+            <input
+              type="number"
+              placeholder="Height"
+              class="input input-bordered w-full"
+              bind:value={objectForm.height}
+            />
+          </div>
+        {/if}
+
+        <div class="grid grid-cols-2 gap-4">
           <input
             type="number"
-            id="objectWidth"
-            bind:value={objectForm.width}
-            min="10"
-            max="200"
+            placeholder="Mass"
+            class="input input-bordered w-full"
+            bind:value={objectForm.mass}
           />
-        </div>
-        <div class="control-group">
-          <label for="objectHeight">Height:</label>
           <input
             type="number"
-            id="objectHeight"
-            bind:value={objectForm.height}
-            min="10"
-            max="200"
+            placeholder="Density"
+            class="input input-bordered w-full"
+            bind:value={objectForm.density}
           />
         </div>
-      {/if}
 
-      <div class="control-group">
-        <label for="objectMass">Mass (kg):</label>
-        <input
-          type="number"
-          id="objectMass"
-          bind:value={objectForm.mass}
-          min="0.1"
-          max="100"
-          step="0.1"
-        />
-      </div>
-
-      <div class="control-group">
-        <label for="objectFriction">Friction:</label>
-        <input
-          type="range"
-          id="objectFriction"
-          bind:value={objectForm.friction}
-          min="0"
-          max="1"
-          step="0.1"
-        />
-        <span>{objectForm.friction}</span>
-      </div>
-
-      <div class="control-group">
-        <label for="objectElasticity">Elasticity:</label>
-        <input
-          type="range"
-          id="objectElasticity"
-          bind:value={objectForm.restitution}
-          min="0"
-          max="1"
-          step="0.1"
-        />
-        <span>{objectForm.restitution}</span>
-      </div>
-
-      <div class="control-group">
-        <label for="objectAirResistance">Air Resistance:</label>
-        <input
-          type="range"
-          id="objectAirResistance"
-          bind:value={objectForm.airResistance}
-          min="0"
-          max="0.1"
-          step="0.01"
-        />
-        <span>{objectForm.airResistance}</span>
-      </div>
-
-      <div class="control-group">
-        <label for="objectRotation">Rotation (deg):</label>
-        <input
-          type="number"
-          id="objectRotation"
-          bind:value={objectForm.rotation}
-          min="0"
-          max="360"
-        />
-      </div>
-
-      <div class="control-group">
-        <label for="objectAngularVelocity">Angular Velocity:</label>
-        <input
-          type="number"
-          id="objectAngularVelocity"
-          bind:value={objectForm.angularVelocity}
-          step="0.1"
-        />
-      </div>
-
-      <div class="control-group">
-        <label>
-          <input type="checkbox" bind:checked={objectForm.isStatic} />
-          Static Object
-        </label>
-      </div>
-
-      {#if selectedObject}
-        <div class="control-group">
-          <button class="btn btn-success" on:click={handleUpdateObject}>
-            💾 Update Object
-          </button>
-          <button class="btn btn-danger" on:click={handleDeleteObject}>
-            🗑️ Delete Object
-          </button>
+        <div>
+          <label class="label" for="friction-range">
+            <span class="label-text text-white">Friction</span>
+          </label>
+          <input
+            id="friction-range"
+            type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            class="range range-primary"
+            bind:value={objectForm.friction}
+          />
         </div>
-      {:else}
-        <button class="btn btn-success" on:click={handleCreateObject}>
-          ➕ Create Object
-        </button>
-      {/if}
+        <div>
+          <label class="label" for="elasticity-range">
+            <span class="label-text text-white">Elasticity</span>
+          </label>
+          <input
+            id="elasticity-range"
+            type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            class="range range-primary"
+            bind:value={objectForm.restitution}
+          />
+        </div>
+        <div>
+          <label class="label" for="air-resistance-range">
+            <span class="label-text text-white">Air Resistance</span>
+          </label>
+          <input
+            id="air-resistance-range"
+            type="range"
+            min="0"
+            max="0.1"
+            step="0.01"
+            class="range range-primary"
+            bind:value={objectForm.airResistance}
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <input
+            type="number"
+            placeholder="Initial Velocity X"
+            class="input input-bordered w-full"
+            bind:value={objectForm.initialVelocityX}
+          />
+          <input
+            type="number"
+            placeholder="Initial Velocity Y"
+            class="input input-bordered w-full"
+            bind:value={objectForm.initialVelocityY}
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <input
+            type="number"
+            placeholder="Rotation"
+            class="input input-bordered w-full"
+            bind:value={objectForm.rotation}
+          />
+          <input
+            type="number"
+            placeholder="Angular Velocity"
+            class="input input-bordered w-full"
+            bind:value={objectForm.angularVelocity}
+          />
+        </div>
+
+        <div class="form-control">
+          <label class="label cursor-pointer">
+            <span class="label-text text-white">Static Object</span>
+            <input
+              type="checkbox"
+              class="toggle toggle-primary"
+              bind:checked={objectForm.isStatic}
+            />
+          </label>
+        </div>
+        <div class="form-control">
+          <label class="label cursor-pointer">
+            <span class="label-text text-white">Hollow Object</span>
+            <input
+              type="checkbox"
+              class="toggle toggle-primary"
+              bind:checked={objectForm.isHollow}
+            />
+          </label>
+        </div>
+
+        <input
+          type="text"
+          placeholder="Custom Tags (comma-separated)"
+          class="input input-bordered w-full"
+          bind:value={objectForm.customTags}
+          on:input={handleCustomTagsChange}
+        />
+
+        {#if selectedObject}
+          <div class="grid grid-cols-2 gap-4">
+            <button class="btn btn-success" on:click={handleUpdateObject}
+              >💾 Update</button
+            >
+            <button class="btn btn-danger" on:click={handleDeleteObject}
+              >🗑️ Delete</button
+            >
+          </div>
+        {:else}
+          <button class="btn btn-success w-full" on:click={handleCreateObject}
+            >➕ Create</button
+          >
+        {/if}
+      </div>
     </div>
 
     <!-- Object List -->
-    <div class="control-section">
-      <h3>Objects ({$objectsStore.length})</h3>
-      <div class="object-list">
+    <div>
+      <h2 class="text-xl font-semibold mb-4">
+        Objects ({$objectsStore.length})
+      </h2>
+      <div class="space-y-2">
         {#each $objectsStore as object (object.id)}
-          <div
-            class="object-item {object.selected ? 'selected' : ''}"
+          <button
+            in:fly={{ y: -10, duration: 300 }}
+            out:fly={{ x: -20, duration: 200 }}
+            class="btn btn-outline w-full justify-start {object.selected
+              ? 'btn-primary'
+              : ''}"
             on:click={() => selectedObjectStore.set(object)}
           >
-            <div class="object-info">
-              <div class="object-name">{object.name}</div>
-              <div class="object-details">
-                {object.config.shape} | Mass: {object.config.mass}kg
+            <div class="flex items-center space-x-4">
+              <div
+                class="w-4 h-4 rounded-full"
+                style="background-color: {object.color}"
+              ></div>
+              <div>
+                <div class="font-bold">{object.name}</div>
+                <div class="text-xs opacity-60">
+                  {object.config.shape} | Mass: {object.config.mass}kg
+                </div>
               </div>
             </div>
-            <div
-              class="object-color"
-              style="background-color: {object.color}"
-            ></div>
-          </div>
+          </button>
         {/each}
       </div>
     </div>
-  </div>
+  </aside>
 
   <!-- Main Canvas Area -->
-  <div class="canvas-container">
+  <main class="flex-1 flex items-center justify-center p-6">
     <PhysicsCanvas
       width={800}
       height={600}
       showVectors={$physicsStore.showVectors}
       onObjectSelected={handleObjectSelected}
     />
-  </div>
+  </main>
 </div>
 
 <style>
-  .app-container {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  }
+  /* Custom styles for specific components that can't be handled by Tailwind/DaisyUI */
 
-  .sidebar {
-    width: 350px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-right: 1px solid rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
-    padding: 20px;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  }
-
-  .sidebar-header {
-    text-align: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid #e0e0e0;
-  }
-
-  .sidebar-header h2 {
-    color: #333;
-    font-size: 24px;
-    margin-bottom: 5px;
-  }
-
-  .sidebar-header p {
-    color: #666;
-    font-size: 14px;
-  }
-
-  .control-section {
-    margin-bottom: 30px;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.7);
-    border-radius: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-  }
-
-  .control-section h3 {
-    color: #333;
-    margin-bottom: 15px;
-    font-size: 16px;
-    font-weight: 600;
-    border-bottom: 1px solid #e0e0e0;
-    padding-bottom: 8px;
-  }
-
-  .control-group {
-    margin-bottom: 15px;
-  }
-
-  .control-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: #555;
-    font-size: 14px;
-    font-weight: 500;
-  }
-
-  .control-group input[type="text"],
-  .control-group input[type="number"],
-  .control-group select {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
-    background: white;
-    transition: border-color 0.3s ease;
-  }
-
-  .control-group input[type="text"]:focus,
-  .control-group input[type="number"]:focus,
-  .control-group select:focus {
-    outline: none;
-    border-color: #4caf50;
-    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
-  }
-
-  .control-group input[type="range"] {
-    width: 70%;
-    margin-right: 10px;
-  }
-
-  .control-group input[type="color"] {
-    width: 50px;
-    height: 35px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-
-  .control-group input[type="checkbox"] {
-    margin-right: 8px;
-  }
-
-  .control-group span {
-    font-size: 12px;
-    color: #666;
-    font-weight: 500;
-  }
-
-  .btn {
-    padding: 10px 16px;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-right: 8px;
-    margin-bottom: 8px;
-  }
-
-  .btn-primary {
-    background: #2196f3;
-    color: white;
-  }
-
-  .btn-primary:hover {
-    background: #1976d2;
-    transform: translateY(-1px);
-  }
-
-  .btn-secondary {
-    background: #757575;
-    color: white;
-  }
-
-  .btn-secondary:hover {
-    background: #616161;
-    transform: translateY(-1px);
-  }
-
-  .btn-success {
-    background: #4caf50;
-    color: white;
-    width: 100%;
-    margin-top: 10px;
-  }
-
-  .btn-success:hover {
-    background: #388e3c;
-    transform: translateY(-1px);
-  }
-
-  .btn-danger {
-    background: #f44336;
-    color: white;
-    width: 100%;
-    margin-top: 10px;
-  }
-
-  .btn-danger:hover {
-    background: #d32f2f;
-    transform: translateY(-1px);
-  }
-
-  .object-list {
-    max-height: 200px;
-    overflow-y: auto;
-  }
-
-  .object-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    margin-bottom: 8px;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 6px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    cursor: pointer;
-  }
-
-  .object-item:hover {
-    background: rgba(255, 255, 255, 0.95);
-    transform: translateX(2px);
-  }
-
-  .object-item.selected {
-    background: rgba(76, 175, 80, 0.1);
-    border-color: #4caf50;
-  }
-
-  .object-info {
-    flex: 1;
-  }
-
-  .object-name {
-    font-weight: 600;
-    color: #333;
-    font-size: 14px;
-  }
-
-  .object-details {
-    font-size: 12px;
-    color: #666;
-    margin-top: 2px;
-  }
-
-  .object-color {
-    width: 20px;
-    height: 20px;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-  }
-
-  .canvas-container {
-    flex: 1;
-    padding: 20px;
-  }
-
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .app-container {
-      flex-direction: column;
-    }
-
-    .sidebar {
-      width: 100%;
-      height: 40vh;
-      overflow-y: auto;
-    }
-
-    .canvas-container {
-      height: 60vh;
-      padding: 10px;
-    }
-  }
-
-  /* Scrollbar Styling */
-  .sidebar::-webkit-scrollbar,
-  .object-list::-webkit-scrollbar {
+  /* Custom scrollbar styling for the sidebar */
+  aside::-webkit-scrollbar {
     width: 6px;
   }
 
-  .sidebar::-webkit-scrollbar-track,
-  .object-list::-webkit-scrollbar-track {
+  aside::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.1);
     border-radius: 3px;
   }
 
-  .sidebar::-webkit-scrollbar-thumb,
-  .object-list::-webkit-scrollbar-thumb {
+  aside::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.3);
     border-radius: 3px;
   }
 
-  .sidebar::-webkit-scrollbar-thumb:hover,
-  .object-list::-webkit-scrollbar-thumb:hover {
+  aside::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 0, 0, 0.5);
   }
 </style>
