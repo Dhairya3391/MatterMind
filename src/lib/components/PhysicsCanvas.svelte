@@ -6,9 +6,7 @@
     objectsStore,
     selectedObjectStore,
   } from "$lib/stores/physics.store";
-  import type {
-    PhysicsObject,
-  } from "$lib/types/physics.types";
+  import type { PhysicsObject } from "$lib/types/physics.types";
   import type { Body } from "matter-js";
   import "$lib/types/global.types";
 
@@ -123,6 +121,6 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
-<div class="w-full h-full bg-base-300 rounded-box overflow-hidden">
+<div class="w-full h-full bg-base-200 rounded-2xl overflow-hidden">
   <canvas bind:this={canvas} id="physicsCanvas" {width} {height}></canvas>
 </div>

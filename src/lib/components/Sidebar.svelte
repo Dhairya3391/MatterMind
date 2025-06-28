@@ -10,7 +10,7 @@
 
   // Define the form interface
   interface ObjectFormData {
-    shape: "rectangle" | "circle" | "polygon";
+    shape: "rectangle" | "circle" | "polygon" | "triangle" | "pentagon";
     name: string;
     color: string;
     width: number;
@@ -74,33 +74,33 @@
   }
 </script>
 
-<div class="h-full flex flex-col bg-base-200/20">
+<div class="h-full flex flex-col bg-base-200">
   <!-- Tab Navigation -->
-  <div class="p-6 border-b border-base-300/50">
-    <div class="flex space-x-1 bg-base-300/50 rounded-xl p-1">
+  <div class="p-6 border-b border-base-300">
+    <div class="flex bg-base-300 rounded-lg p-1">
       <button
-        class="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-all {activeTab ===
+        class="flex-1 px-4 py-2.5 text-sm font-medium rounded-md transition-all {activeTab ===
         'create'
-          ? 'bg-primary text-primary-content shadow-sm'
-          : 'text-base-content/70 hover:text-base-content hover:bg-base-300/30'}"
+          ? 'bg-base-200 text-base-content shadow-sm'
+          : 'text-base-content/70 hover:text-base-content hover:bg-base-300/50'}"
         on:click={() => (activeTab = "create")}
       >
         Create
       </button>
       <button
-        class="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-all {activeTab ===
+        class="flex-1 px-4 py-2.5 text-sm font-medium rounded-md transition-all {activeTab ===
         'objects'
-          ? 'bg-primary text-primary-content shadow-sm'
-          : 'text-base-content/70 hover:text-base-content hover:bg-base-300/30'}"
+          ? 'bg-base-200 text-base-content shadow-sm'
+          : 'text-base-content/70 hover:text-base-content hover:bg-base-300/50'}"
         on:click={() => (activeTab = "objects")}
       >
         Objects ({$objectsStore.length})
       </button>
       <button
-        class="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-all {activeTab ===
+        class="flex-1 px-4 py-2.5 text-sm font-medium rounded-md transition-all {activeTab ===
         'settings'
-          ? 'bg-primary text-primary-content shadow-sm'
-          : 'text-base-content/70 hover:text-base-content hover:bg-base-300/30'}"
+          ? 'bg-base-200 text-base-content shadow-sm'
+          : 'text-base-content/70 hover:text-base-content hover:bg-base-300/50'}"
         on:click={() => (activeTab = "settings")}
       >
         Settings
@@ -113,9 +113,9 @@
     {#if activeTab === "create"}
       <div class="p-6 space-y-6" in:fade={{ duration: 200 }}>
         <!-- Simulation Controls Card -->
-        <div class="bg-base-300/20 rounded-xl p-4 border border-base-300/30">
+        <div class="bg-base-300 rounded-xl p-4 border border-base-300/50">
           <h3
-            class="text-sm font-semibold text-base-content/80 uppercase tracking-wide mb-4"
+            class="text-sm font-semibold text-base-content mb-4 uppercase tracking-wide"
           >
             Simulation Controls
           </h3>
@@ -129,9 +129,9 @@
         </div>
 
         <!-- Object Form Card -->
-        <div class="bg-base-300/20 rounded-xl p-4 border border-base-300/30">
+        <div class="bg-base-300 rounded-xl p-4 border border-base-300/50">
           <h3
-            class="text-sm font-semibold text-base-content/80 uppercase tracking-wide mb-4"
+            class="text-sm font-semibold text-base-content mb-4 uppercase tracking-wide"
           >
             {selectedObject ? "Edit Object" : "Create New Object"}
           </h3>
@@ -146,15 +146,15 @@
       </div>
     {:else if activeTab === "objects"}
       <div class="p-6" in:fade={{ duration: 200 }}>
-        <div class="bg-base-300/20 rounded-xl p-4 border border-base-300/30">
+        <div class="bg-base-300 rounded-xl p-4 border border-base-300/50">
           <ObjectsList />
         </div>
       </div>
     {:else if activeTab === "settings"}
       <div class="p-6" in:fade={{ duration: 200 }}>
-        <div class="bg-base-300/20 rounded-xl p-4 border border-base-300/30">
+        <div class="bg-base-300 rounded-xl p-4 border border-base-300/50">
           <h3
-            class="text-sm font-semibold text-base-content/80 uppercase tracking-wide mb-4"
+            class="text-sm font-semibold text-base-content mb-4 uppercase tracking-wide"
           >
             Application Settings
           </h3>

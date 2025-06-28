@@ -1,5 +1,5 @@
 import Matter from "matter-js";
-const { Engine, World, Body, Runner } = Matter;
+const { Engine, World, Body, Runner, Bodies, MouseConstraint, Mouse } = Matter;
 import type { ObjectConfig, PhysicsObject } from "$lib/types/physics.types";
 import { createObject } from "./object-factory";
 import { Renderer } from "./renderer";
@@ -15,6 +15,11 @@ export class PhysicsEngine {
   private selectedObject: Matter.Body | null = null;
   private fps: number = 60;
   private lastTime: number = 0;
+  private mouseConstraint: Matter.MouseConstraint | null = null;
+  private boundaries: Matter.Body[] = [];
+  private showBounds: boolean = true;
+  private showGrid: boolean = false;
+  private isRunning: boolean = false;
 
   constructor(canvasId: string) {
     this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
@@ -24,6 +29,10 @@ export class PhysicsEngine {
 
     this.engine = Engine.create({
       gravity: { x: 0, y: 1, scale: 0.001 },
+      // Enhanced collision detection
+      constraintIterations: 4,
+      positionIterations: 6,
+      velocityIterations: 4,
     });
 
     this.renderer = new Renderer(this.canvas, this.objects);
@@ -32,6 +41,79 @@ export class PhysicsEngine {
     this.eventHandler.setOnObjectSelected((body) => {
       this.selectObject(body);
     });
+
+    // Setup mouse constraint for better object interaction
+    this.setupMouseConstraint();
+    
+    // Create boundaries
+    this.createBoundaries();
+  }
+
+  private setupMouseConstraint(): void {
+    const mouse = Mouse.create(this.canvas);
+    this.mouseConstraint = MouseConstraint.create(this.engine, {
+      mouse: mouse,
+      constraint: {
+        stiffness: 0.2,
+        render: {
+          visible: false
+        }
+      }
+    });
+
+    World.add(this.engine.world, this.mouseConstraint);
+    
+    // Keep mouse in sync with canvas
+    this.canvas.addEventListener('mousemove', (event) => {
+      const rect = this.canvas.getBoundingClientRect();
+      mouse.position.x = event.clientX - rect.left;
+      mouse.position.y = event.clientY - rect.top;
+    });
+  }
+
+  private createBoundaries(): void {
+    const canvasWidth = this.canvas.width;
+    const canvasHeight = this.canvas.height;
+    const wallThickness = 20;
+
+    // Left wall
+    const leftWall = Bodies.rectangle(
+      wallThickness / 2,
+      canvasHeight / 2,
+      wallThickness,
+      canvasHeight,
+      { isStatic: true, friction: 0.3, restitution: 0.5 }
+    );
+
+    // Right wall
+    const rightWall = Bodies.rectangle(
+      canvasWidth - wallThickness / 2,
+      canvasHeight / 2,
+      wallThickness,
+      canvasHeight,
+      { isStatic: true, friction: 0.3, restitution: 0.5 }
+    );
+
+    // Bottom wall (ground)
+    const ground = Bodies.rectangle(
+      canvasWidth / 2,
+      canvasHeight - wallThickness / 2,
+      canvasWidth,
+      wallThickness,
+      { isStatic: true, friction: 0.3, restitution: 0.5 }
+    );
+
+    // Top wall (ceiling)
+    const ceiling = Bodies.rectangle(
+      canvasWidth / 2,
+      wallThickness / 2,
+      canvasWidth,
+      wallThickness,
+      { isStatic: true, friction: 0.3, restitution: 0.5 }
+    );
+
+    this.boundaries = [leftWall, rightWall, ground, ceiling];
+    World.add(this.engine.world, this.boundaries);
   }
 
   private selectObject(body: Matter.Body | null): void {
@@ -197,7 +279,15 @@ export class PhysicsEngine {
   }
 
   public clearAllObjects(): void {
-    World.clear(this.engine.world, false);
+    // Remove all objects except boundaries
+    const bodiesToRemove = this.engine.world.bodies.filter(
+      body => !this.boundaries.includes(body) && body !== this.mouseConstraint?.body
+    );
+    
+    bodiesToRemove.forEach(body => {
+      World.remove(this.engine.world, body);
+    });
+    
     this.objects.clear();
     this.selectedObject = null;
   }
@@ -213,24 +303,63 @@ export class PhysicsEngine {
   }
 
   public togglePause(): boolean {
-    if (this.runner && this.runner.enabled) {
-      Runner.stop(this.runner);
-    } else if (this.runner) {
-      Runner.run(this.runner, this.engine);
+    if (this.runner) {
+      if (this.isRunning) {
+        Runner.stop(this.runner);
+        this.isRunning = false;
+      } else {
+        Runner.run(this.runner, this.engine);
+        this.isRunning = true;
+      }
     }
-    return this.runner ? this.runner.enabled : false;
+    return this.isRunning;
+  }
+
+  public setRunning(running: boolean): void {
+    if (this.runner) {
+      if (running && !this.isRunning) {
+        Runner.run(this.runner, this.engine);
+        this.isRunning = true;
+      } else if (!running && this.isRunning) {
+        Runner.stop(this.runner);
+        this.isRunning = false;
+      }
+    }
   }
 
   public reset(): void {
     this.clearAllObjects();
     if (this.runner) {
       Runner.stop(this.runner);
+      this.isRunning = false;
       Runner.run(this.runner, this.engine);
+      this.isRunning = true;
     }
   }
 
   public setShowVectors(show: boolean): void {
     this.renderer.setShowVectors(show);
+  }
+
+  public setShowBounds(show: boolean): void {
+    this.showBounds = show;
+  }
+
+  public toggleBounds(): void {
+    this.showBounds = !this.showBounds;
+    if (this.showBounds) {
+      // Add boundaries back if they were removed
+      if (this.boundaries.length > 0) {
+        World.add(this.engine.world, this.boundaries);
+      }
+    } else {
+      // Remove boundaries
+      World.remove(this.engine.world, this.boundaries);
+    }
+  }
+
+  public setShowGrid(show: boolean): void {
+    this.showGrid = show;
   }
 
   private updateFPS(): void {
@@ -244,9 +373,14 @@ export class PhysicsEngine {
   public start(): void {
     this.runner = Runner.create();
     Runner.run(this.runner, this.engine);
+    this.isRunning = true;
 
     const renderLoop = () => {
-      this.renderer.render(this.engine);
+      this.renderer.render(this.engine, {
+        showBounds: this.showBounds,
+        showGrid: this.showGrid,
+        boundaries: this.boundaries
+      });
       this.updateFPS();
       requestAnimationFrame(renderLoop);
     };
@@ -296,8 +430,11 @@ export class PhysicsEngine {
   public cleanup(): void {
     if (this.runner) {
       Runner.stop(this.runner);
+      this.isRunning = false;
     }
-    World.clear(this.engine.world, false);
-    this.objects.clear();
+    this.clearAllObjects();
+    if (this.mouseConstraint) {
+      World.remove(this.engine.world, this.mouseConstraint);
+    }
   }
 }

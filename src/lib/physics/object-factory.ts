@@ -10,6 +10,10 @@ interface ExtendedMatterBody extends Matter.Body {
   tags?: string[];
   isPolygon?: boolean;
   polygonRadius?: number;
+  polygonSides?: number;
+  isStar?: boolean;
+  isRope?: boolean;
+  ropeSegments?: Matter.Body[];
 }
 
 export function createObject(config: ObjectConfig): Matter.Body | null {
@@ -65,7 +69,7 @@ export function createObject(config: ObjectConfig): Matter.Body | null {
       break;
 
     case "polygon":
-      // Create a simple hexagon using circle with custom rendering
+      // Create a hexagon using circle with custom rendering
       body = Bodies.circle(x, y, radius!, {
         isStatic,
         friction,
@@ -76,6 +80,112 @@ export function createObject(config: ObjectConfig): Matter.Body | null {
       // Mark as polygon for custom rendering
       (body as ExtendedMatterBody).isPolygon = true;
       (body as ExtendedMatterBody).polygonRadius = radius;
+      (body as ExtendedMatterBody).polygonSides = 6;
+      break;
+
+    case "triangle":
+      // Create a triangle using polygon vertices
+      const triangleRadius = radius || 25;
+      const triangleVertices = [
+        { x: 0, y: -triangleRadius },
+        { x: -triangleRadius * Math.cos(Math.PI / 6), y: triangleRadius * Math.sin(Math.PI / 6) },
+        { x: triangleRadius * Math.cos(Math.PI / 6), y: triangleRadius * Math.sin(Math.PI / 6) }
+      ];
+      
+      body = Bodies.fromVertices(x, y, [triangleVertices], {
+        isStatic,
+        friction,
+        restitution,
+        density: calculatedDensity,
+        angle: (rotation * Math.PI) / 180,
+      });
+      
+      // Mark as polygon for custom rendering
+      (body as ExtendedMatterBody).isPolygon = true;
+      (body as ExtendedMatterBody).polygonRadius = triangleRadius;
+      (body as ExtendedMatterBody).polygonSides = 3;
+      break;
+
+    case "pentagon":
+      // Create a pentagon using polygon vertices
+      const pentagonRadius = radius || 25;
+      const pentagonVertices = [];
+      const sides = 5;
+      
+      for (let i = 0; i < sides; i++) {
+        const angle = (i * 2 * Math.PI) / sides - Math.PI / 2; // Start from top
+        pentagonVertices.push({
+          x: pentagonRadius * Math.cos(angle),
+          y: pentagonRadius * Math.sin(angle)
+        });
+      }
+      
+      body = Bodies.fromVertices(x, y, [pentagonVertices], {
+        isStatic,
+        friction,
+        restitution,
+        density: calculatedDensity,
+        angle: (rotation * Math.PI) / 180,
+      });
+      
+      // Mark as polygon for custom rendering
+      (body as ExtendedMatterBody).isPolygon = true;
+      (body as ExtendedMatterBody).polygonRadius = pentagonRadius;
+      (body as ExtendedMatterBody).polygonSides = 5;
+      break;
+
+    case "star":
+      // Create a star using polygon vertices
+      const starRadius = radius || 25;
+      const starVertices = [];
+      const starPoints = 5;
+      const innerRadius = starRadius * 0.4;
+      
+      for (let i = 0; i < starPoints * 2; i++) {
+        const angle = (i * Math.PI) / starPoints - Math.PI / 2;
+        const currentRadius = i % 2 === 0 ? starRadius : innerRadius;
+        starVertices.push({
+          x: currentRadius * Math.cos(angle),
+          y: currentRadius * Math.sin(angle)
+        });
+      }
+      
+      body = Bodies.fromVertices(x, y, [starVertices], {
+        isStatic,
+        friction,
+        restitution,
+        density: calculatedDensity,
+        angle: (rotation * Math.PI) / 180,
+      });
+      
+      // Mark as polygon for custom rendering
+      (body as ExtendedMatterBody).isPolygon = true;
+      (body as ExtendedMatterBody).polygonRadius = starRadius;
+      (body as ExtendedMatterBody).polygonSides = starPoints * 2;
+      (body as ExtendedMatterBody).isStar = true;
+      break;
+
+    case "rope":
+      // Create a rope using multiple connected circles
+      const ropeRadius = radius || 8;
+      const ropeLength = 6;
+      const ropeSegments = [];
+      
+      for (let i = 0; i < ropeLength; i++) {
+        const segment = Bodies.circle(x + i * ropeRadius * 1.5, y, ropeRadius, {
+          isStatic: i === 0, // Only first segment is static
+          friction,
+          restitution,
+          density: calculatedDensity,
+          angle: (rotation * Math.PI) / 180,
+        });
+        ropeSegments.push(segment);
+      }
+      
+      // Connect segments with constraints (simplified - just return first segment)
+      body = ropeSegments[0];
+      (body as ExtendedMatterBody).isRope = true;
+      (body as ExtendedMatterBody).ropeSegments = ropeSegments;
       break;
 
     default:
@@ -119,6 +229,18 @@ function calculateArea(
     case "polygon":
       // Approximate hexagon area
       return ((3 * Math.sqrt(3)) / 2) * (radius || 0) * (radius || 0);
+    case "triangle":
+      // Equilateral triangle area
+      return (Math.sqrt(3) / 4) * (radius || 0) * (radius || 0);
+    case "pentagon":
+      // Regular pentagon area
+      return (5 / 4) * (radius || 0) * (radius || 0) * Math.tan(Math.PI / 5);
+    case "star":
+      // Approximate star area (simplified)
+      return Math.PI * (radius || 0) * (radius || 0) * 0.6;
+    case "rope":
+      // Rope area (single segment)
+      return Math.PI * (radius || 0) * (radius || 0);
     default:
       return 1;
   }

@@ -34,14 +34,14 @@
         />
       </svg>
       <h3
-        class="text-sm font-semibold text-base-content/80 uppercase tracking-wide"
+        class="text-sm font-semibold text-base-content uppercase tracking-wide"
       >
         Objects ({$objectsStore.length})
       </h3>
     </div>
     {#if $objectsStore.length > 0}
       <button
-        class="text-xs text-base-content/60 hover:text-base-content transition-colors px-2 py-1 rounded hover:bg-base-300/30"
+        class="text-xs text-base-content/60 hover:text-base-content transition-colors px-2 py-1 rounded hover:bg-base-200"
         on:click={() => selectedObjectStore.clear()}
       >
         Clear Selection
@@ -52,7 +52,7 @@
   {#if $objectsStore.length === 0}
     <div class="text-center py-12">
       <div
-        class="w-16 h-16 mx-auto mb-4 rounded-full bg-base-300/50 flex items-center justify-center"
+        class="w-16 h-16 mx-auto mb-4 rounded-full bg-base-200 flex items-center justify-center"
       >
         <span class="text-3xl text-base-content/30">●</span>
       </div>
@@ -71,14 +71,11 @@
           class:bg-primary={object.selected}
           class:bg-opacity-20={object.selected}
           class:border-primary={object.selected}
-          class:bg-base-300={!object.selected}
-          class:bg-opacity-30={!object.selected}
+          class:bg-base-200={!object.selected}
           class:border-base-300={!object.selected}
-          class:border-opacity-30={!object.selected}
-          class:hover:bg-base-300={!object.selected}
-          class:hover:bg-opacity-50={!object.selected}
+          class:border-opacity-50={!object.selected}
+          class:hover:bg-base-200={!object.selected}
           class:hover:border-base-300={!object.selected}
-          class:hover:border-opacity-50={!object.selected}
           class:hover:shadow-md={!object.selected}
           on:click={() => selectObject(object)}
           on:keydown={(e) => handleKeydown(e, object)}

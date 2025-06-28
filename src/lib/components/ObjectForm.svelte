@@ -5,7 +5,14 @@
 
   // Define the form interface
   interface ObjectFormData {
-    shape: "rectangle" | "circle" | "polygon";
+    shape:
+      | "rectangle"
+      | "circle"
+      | "polygon"
+      | "triangle"
+      | "pentagon"
+      | "star"
+      | "rope";
     name: string;
     color: string;
     width: number;
@@ -39,7 +46,12 @@
 
   function handleSubmit() {
     const config: ObjectConfig = {
-      shape: objectForm.shape as "rectangle" | "circle" | "polygon",
+      shape: objectForm.shape as
+        | "rectangle"
+        | "circle"
+        | "polygon"
+        | "triangle"
+        | "pentagon",
       name: objectForm.name || `Object ${Date.now()}`,
       color: objectForm.color.startsWith("#") ? objectForm.color : "#4CAF50",
       x: 400,
@@ -112,7 +124,7 @@
         />
       </svg>
       <h3
-        class="text-sm font-semibold text-base-content/80 uppercase tracking-wide"
+        class="text-sm font-semibold text-base-content uppercase tracking-wide"
       >
         Basic Properties
       </h3>
@@ -127,12 +139,16 @@
           >
           <select
             id="shape"
-            class="w-full px-3 py-2.5 bg-base-300/50 border border-base-300/50 rounded-lg text-base-content focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+            class="w-full px-3 py-2.5 bg-base-200 border border-base-300 rounded-lg text-base-content focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
             bind:value={objectForm.shape}
           >
             <option value="rectangle">Rectangle</option>
             <option value="circle">Circle</option>
             <option value="polygon">Polygon</option>
+            <option value="triangle">Triangle</option>
+            <option value="pentagon">Pentagon</option>
+            <option value="star">Star</option>
+            <option value="rope">Rope</option>
           </select>
         </div>
 
@@ -145,7 +161,7 @@
             id="name"
             type="text"
             placeholder="Object Name"
-            class="w-full px-3 py-2.5 bg-base-300/50 border border-base-300/50 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+            class="w-full px-3 py-2.5 bg-base-200 border border-base-300 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
             bind:value={objectForm.name}
           />
         </div>
@@ -160,7 +176,7 @@
           <input
             id="color"
             type="color"
-            class="w-full h-12 bg-base-300/50 border border-base-300/50 rounded-lg cursor-pointer"
+            class="w-full h-12 bg-base-200 border border-base-300 rounded-lg cursor-pointer"
             bind:value={objectForm.color}
           />
         </div>
@@ -171,7 +187,7 @@
           >
           <select
             id="material"
-            class="w-full px-3 py-2.5 bg-base-300/50 border border-base-300/50 rounded-lg text-base-content focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+            class="w-full px-3 py-2.5 bg-base-200 border border-base-300 rounded-lg text-base-content focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
             on:change={handleMaterialPresetChange}
           >
             <option value="">Custom</option>
@@ -193,7 +209,7 @@
         />
       </svg>
       <h3
-        class="text-sm font-semibold text-base-content/80 uppercase tracking-wide"
+        class="text-sm font-semibold text-base-content uppercase tracking-wide"
       >
         Dimensions
       </h3>
@@ -209,7 +225,7 @@
           id="radius"
           type="number"
           placeholder="Radius"
-          class="w-full px-3 py-2.5 bg-base-300/50 border border-base-300/50 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+          class="w-full px-3 py-2.5 bg-base-200 border border-base-300 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
           bind:value={objectForm.radius}
         />
       </div>
@@ -224,7 +240,7 @@
             id="width"
             type="number"
             placeholder="Width"
-            class="w-full px-3 py-2.5 bg-base-300/50 border border-base-300/50 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+            class="w-full px-3 py-2.5 bg-base-200 border border-base-300 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
             bind:value={objectForm.width}
           />
         </div>
@@ -237,7 +253,7 @@
             id="height"
             type="number"
             placeholder="Height"
-            class="w-full px-3 py-2.5 bg-base-300/50 border border-base-300/50 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+            class="w-full px-3 py-2.5 bg-base-200 border border-base-300 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
             bind:value={objectForm.height}
           />
         </div>
@@ -254,7 +270,7 @@
         />
       </svg>
       <h3
-        class="text-sm font-semibold text-base-content/80 uppercase tracking-wide"
+        class="text-sm font-semibold text-base-content uppercase tracking-wide"
       >
         Physics Properties
       </h3>
@@ -270,7 +286,7 @@
           id="mass"
           type="number"
           placeholder="Mass"
-          class="w-full px-3 py-2.5 bg-base-300/50 border border-base-300/50 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+          class="w-full px-3 py-2.5 bg-base-200 border border-base-300 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
           bind:value={objectForm.mass}
         />
       </div>
@@ -283,7 +299,7 @@
           id="density"
           type="number"
           placeholder="Density"
-          class="w-full px-3 py-2.5 bg-base-300/50 border border-base-300/50 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+          class="w-full px-3 py-2.5 bg-base-200 border border-base-300 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
           bind:value={objectForm.density}
         />
       </div>
@@ -301,7 +317,7 @@
           min="0"
           max="1"
           step="0.1"
-          class="w-full h-2 bg-base-300/50 rounded-lg appearance-none cursor-pointer slider"
+          class="w-full h-2 bg-base-200 rounded-lg appearance-none cursor-pointer slider"
           bind:value={objectForm.friction}
         />
       </div>
@@ -317,7 +333,7 @@
           min="0"
           max="1"
           step="0.1"
-          class="w-full h-2 bg-base-300/50 rounded-lg appearance-none cursor-pointer slider"
+          class="w-full h-2 bg-base-200 rounded-lg appearance-none cursor-pointer slider"
           bind:value={objectForm.restitution}
         />
       </div>
@@ -334,7 +350,7 @@
           min="0"
           max="0.1"
           step="0.01"
-          class="w-full h-2 bg-base-300/50 rounded-lg appearance-none cursor-pointer slider"
+          class="w-full h-2 bg-base-200 rounded-lg appearance-none cursor-pointer slider"
           bind:value={objectForm.airResistance}
         />
       </div>
@@ -350,7 +366,7 @@
         />
       </svg>
       <h3
-        class="text-sm font-semibold text-base-content/80 uppercase tracking-wide"
+        class="text-sm font-semibold text-base-content uppercase tracking-wide"
       >
         Motion Properties
       </h3>
@@ -366,7 +382,7 @@
           id="velocity-x"
           type="number"
           placeholder="VX"
-          class="w-full px-3 py-2.5 bg-base-300/50 border border-base-300/50 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+          class="w-full px-3 py-2.5 bg-base-200 border border-base-300 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
           bind:value={objectForm.initialVelocityX}
         />
       </div>
@@ -379,7 +395,7 @@
           id="velocity-y"
           type="number"
           placeholder="VY"
-          class="w-full px-3 py-2.5 bg-base-300/50 border border-base-300/50 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+          class="w-full px-3 py-2.5 bg-base-200 border border-base-300 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
           bind:value={objectForm.initialVelocityY}
         />
       </div>
@@ -395,7 +411,7 @@
           id="rotation"
           type="number"
           placeholder="Rotation"
-          class="w-full px-3 py-2.5 bg-base-300/50 border border-base-300/50 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+          class="w-full px-3 py-2.5 bg-base-200 border border-base-300 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
           bind:value={objectForm.rotation}
         />
       </div>
@@ -408,7 +424,7 @@
           id="angular-velocity"
           type="number"
           placeholder="Angular"
-          class="w-full px-3 py-2.5 bg-base-300/50 border border-base-300/50 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+          class="w-full px-3 py-2.5 bg-base-200 border border-base-300 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
           bind:value={objectForm.angularVelocity}
         />
       </div>
@@ -424,7 +440,7 @@
         />
       </svg>
       <h3
-        class="text-sm font-semibold text-base-content/80 uppercase tracking-wide"
+        class="text-sm font-semibold text-base-content uppercase tracking-wide"
       >
         Object Properties
       </h3>
@@ -432,7 +448,7 @@
 
     <div class="space-y-3">
       <div
-        class="flex items-center justify-between p-4 bg-base-300/30 rounded-lg border border-base-300/20"
+        class="flex items-center justify-between p-4 bg-base-200 rounded-lg border border-base-300/50"
       >
         <span class="text-sm font-medium text-base-content">Static Object</span>
         <input
@@ -444,7 +460,7 @@
       </div>
 
       <div
-        class="flex items-center justify-between p-4 bg-base-300/30 rounded-lg border border-base-300/20"
+        class="flex items-center justify-between p-4 bg-base-200 rounded-lg border border-base-300/50"
       >
         <span class="text-sm font-medium text-base-content">Hollow Object</span>
         <input
@@ -464,7 +480,7 @@
         id="tags"
         type="text"
         placeholder="wood, heavy, bouncy"
-        class="w-full px-3 py-2.5 bg-base-300/50 border border-base-300/50 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+        class="w-full px-3 py-2.5 bg-base-200 border border-base-300 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
         bind:value={objectForm.customTags}
         on:input={handleCustomTagsChange}
       />
@@ -476,21 +492,21 @@
     {#if selectedObject}
       <button
         type="button"
-        class="flex-1 px-4 py-3 bg-error text-error-content rounded-lg font-medium hover:opacity-90 transition-all shadow-sm hover:shadow-md"
+        class="flex-1 px-4 py-3 bg-error text-error-content rounded-lg font-medium hover:opacity-90 transition-all duration-200 shadow-sm hover:shadow-md"
         on:click={handleDelete}
       >
         Delete
       </button>
       <button
         type="submit"
-        class="flex-1 px-4 py-3 bg-primary text-primary-content rounded-lg font-medium hover:opacity-90 transition-all shadow-sm hover:shadow-md"
+        class="flex-1 px-4 py-3 bg-primary text-primary-content rounded-lg font-medium hover:opacity-90 transition-all duration-200 shadow-sm hover:shadow-md"
       >
         Update
       </button>
     {:else}
       <button
         type="submit"
-        class="w-full px-4 py-3 bg-primary text-primary-content rounded-lg font-medium hover:opacity-90 transition-all shadow-sm hover:shadow-md"
+        class="w-full px-4 py-3 bg-primary text-primary-content rounded-lg font-medium hover:opacity-90 transition-all duration-200 shadow-sm hover:shadow-md"
       >
         Create Object
       </button>

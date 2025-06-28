@@ -6,22 +6,33 @@ export default {
     "./index.html",
   ],
   safelist: [
-    "border-gray-600",
-    "bg-gray-800",
-    "text-white",
-    "placeholder-gray-400",
-    "border-blue-500",
-    "ring-2",
-    "ring-blue-500/20",
-    "bg-gray-700",
-    "bg-blue-600",
-    "border-blue-600",
+    // DaisyUI theme classes
+    "bg-primary",
+    "text-primary-content",
+    "bg-secondary",
+    "text-secondary-content",
+    "bg-accent",
+    "text-accent-content",
+    "bg-neutral",
+    "text-neutral-content",
+    "bg-info",
+    "text-info-content",
+    "bg-success",
+    "text-success-content",
+    "bg-warning",
+    "text-warning-content",
+    "bg-error",
+    "text-error-content",
+    // Base colors
     "bg-base-100",
     "bg-base-200",
     "bg-base-300",
-    "text-gray-300",
-    "text-white",
-    // Add more if you use more in @apply
+    "text-base-content",
+    // Custom opacity classes
+    "bg-base-200-80",
+    "bg-base-200-90",
+    "bg-base-300-50",
+    "border-base-300-50",
   ],
   theme: {
     extend: {
@@ -31,48 +42,23 @@ export default {
       borderRadius: {
         lg: "0.5rem",
         xl: "1rem",
+        "2xl": "1.5rem",
+        "3xl": "2rem",
       },
       boxShadow: {
+        sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        DEFAULT:
+          "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
         lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
         xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+        // Glassy shadows
+        glass: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+        "glass-sm": "0 4px 16px 0 rgba(31, 38, 135, 0.25)",
+        "glass-lg": "0 16px 64px 0 rgba(31, 38, 135, 0.45)",
       },
-      colors: {
-        primary: {
-          50: "#eff6ff",
-          100: "#dbeafe",
-          200: "#bfdbfe",
-          300: "#93c5fd",
-          400: "#60a5fa",
-          500: "#3b82f6",
-          600: "#2563eb",
-          700: "#1d4ed8",
-          800: "#1e40af",
-          900: "#1e3a8a",
-        },
-        secondary: {
-          50: "#f8fafc",
-          100: "#f1f5f9",
-          200: "#e2e8f0",
-          300: "#cbd5e1",
-          400: "#94a3b8",
-          500: "#64748b",
-          600: "#475569",
-          700: "#334155",
-          800: "#1e293b",
-          900: "#0f172a",
-        },
-        slate: {
-          50: "#f8fafc",
-          100: "#f1f5f9",
-          200: "#e2e8f0",
-          300: "#cbd5e1",
-          400: "#94a3b8",
-          500: "#64748b",
-          600: "#475569",
-          700: "#334155",
-          800: "#1e293b",
-          900: "#0f172a",
-        },
+      backdropBlur: {
+        xs: "2px",
       },
     },
   },
@@ -83,26 +69,51 @@ export default {
       {
         nextprime: {
           "color-scheme": "dark",
-          "base-100": "hsl(30, 11%, 4%)",
-          "base-200": "hsl(199, 27%, 18%)",
-          "base-300": "hsl(33, 20%, 31%)",
-          "base-content": "hsl(31, 33%, 88%)",
-          primary: "hsl(32, 33%, 67%)",
-          "primary-content": "hsl(30, 11%, 4%)",
-          secondary: "hsl(33, 20%, 31%)",
-          "secondary-content": "hsl(31, 33%, 88%)",
-          accent: "hsl(31, 33%, 88%)",
-          "accent-content": "hsl(30, 11%, 4%)",
-          neutral: "hsl(199, 27%, 18%)",
-          "neutral-content": "hsl(31, 33%, 88%)",
+          default: true,
+          prefersdark: true,
+
+          /* Color palette mapping */
+          "base-100": "hsl(30, 11%, 4%)" /* black background */,
+          "base-200": "hsl(199, 27%, 18%)" /* gunmetal mid-layer */,
+          "base-300": "hsl(33, 20%, 31%)" /* walnut brown surface */,
+          "base-content": "hsl(31, 33%, 88%)" /* almond text */,
+
+          primary: "hsl(32, 33%, 67%)" /* khaki */,
+          "primary-content": "hsl(30, 11%, 4%)" /* text on primary */,
+
+          secondary: "hsl(33, 20%, 31%)" /* walnut brown */,
+          "secondary-content": "hsl(31, 33%, 88%)" /* almond */,
+
+          accent: "hsl(31, 33%, 88%)" /* almond */,
+          "accent-content": "hsl(30, 11%, 4%)" /* dark text */,
+
+          neutral: "hsl(199, 27%, 18%)" /* gunmetal */,
+          "neutral-content": "hsl(31, 33%, 88%)" /* almond */,
+
+          /* Semantic colors */
           info: "hsl(210, 100%, 65%)",
           "info-content": "hsl(220, 100%, 15%)",
+
           success: "hsl(140, 50%, 50%)",
           "success-content": "hsl(140, 100%, 10%)",
+
           warning: "hsl(45, 100%, 60%)",
           "warning-content": "hsl(30, 100%, 10%)",
+
           error: "hsl(0, 75%, 60%)",
           "error-content": "hsl(0, 100%, 15%)",
+
+          /* Rounded UI */
+          "--rounded-box": "1rem",
+          "--rounded-btn": "0.5rem",
+          "--rounded-badge": "0.5rem",
+          "--animation-btn": "0.25s",
+          "--animation-input": "0.2s",
+          "--btn-text-case": "uppercase",
+          "--btn-focus-scale": "0.95",
+          "--border-btn": "2px",
+          "--tab-border": "2px",
+          "--tab-radius": "0.5rem",
         },
       },
     ],

@@ -9,7 +9,7 @@
   <!-- Control Buttons -->
   <div class="grid grid-cols-2 gap-3">
     <button
-      class="px-4 py-3 bg-primary text-primary-content rounded-lg font-medium hover:opacity-90 transition-all shadow-sm hover:shadow-md"
+      class="px-4 py-3 bg-primary text-primary-content rounded-lg font-medium hover:opacity-90 transition-all duration-200 shadow-sm hover:shadow-md"
       on:click={() => dispatch("togglePause")}
     >
       {#if $physicsStore.isRunning}
@@ -29,7 +29,7 @@
       {/if}
     </button>
     <button
-      class="px-4 py-3 bg-base-300 text-base-content rounded-lg font-medium hover:bg-base-300/80 transition-all shadow-sm hover:shadow-md"
+      class="px-4 py-3 bg-base-200 text-base-content rounded-lg font-medium hover:bg-base-300 transition-all duration-200 shadow-sm hover:shadow-md border border-base-300"
       on:click={() => dispatch("reset")}
     >
       <div class="flex items-center justify-center space-x-2">
@@ -44,7 +44,7 @@
   </div>
 
   <button
-    class="w-full px-4 py-3 bg-accent text-accent-content rounded-lg font-medium hover:opacity-90 transition-all shadow-sm hover:shadow-md"
+    class="w-full px-4 py-3 bg-accent text-accent-content rounded-lg font-medium hover:opacity-90 transition-all duration-200 shadow-sm hover:shadow-md"
     on:click={() => dispatch("createPresetObjects")}
   >
     <div class="flex items-center justify-center space-x-2">
@@ -58,7 +58,7 @@
   <!-- Toggle Controls -->
   <div class="space-y-3">
     <div
-      class="flex items-center justify-between p-4 bg-base-300/30 rounded-lg border border-base-300/20"
+      class="flex items-center justify-between p-4 bg-base-200 rounded-lg border border-base-300/50"
     >
       <div class="flex items-center space-x-3">
         <svg
@@ -81,7 +81,7 @@
     </div>
 
     <div
-      class="flex items-center justify-between p-4 bg-base-300/30 rounded-lg border border-base-300/20"
+      class="flex items-center justify-between p-4 bg-base-200 rounded-lg border border-base-300/50"
     >
       <div class="flex items-center space-x-3">
         <svg

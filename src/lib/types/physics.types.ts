@@ -12,7 +12,7 @@ export interface PhysicsObject {
 }
 
 export interface ObjectConfig {
-  shape: "rectangle" | "circle" | "polygon";
+  shape: "rectangle" | "circle" | "polygon" | "triangle" | "pentagon" | "star" | "rope";
   width?: number;
   height?: number;
   radius?: number;
@@ -42,6 +42,8 @@ export interface PhysicsState {
   isRunning: boolean;
   gravity: boolean;
   showVectors: boolean;
+  showGrid: boolean;
+  showBounds: boolean;
   fps: number;
   objectCount: number;
 }

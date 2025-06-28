@@ -12,7 +12,7 @@
         />
       </svg>
       <h3
-        class="text-sm font-semibold text-base-content/80 uppercase tracking-wide"
+        class="text-sm font-semibold text-base-content uppercase tracking-wide"
       >
         Canvas Settings
       </h3>
@@ -29,13 +29,13 @@
             id="canvas-width"
             type="number"
             placeholder="Width"
-            class="w-full px-3 py-2.5 bg-base-300/50 border border-base-300/50 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+            class="w-full px-3 py-2.5 bg-base-200 border border-base-300 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
             value="800"
           />
           <input
             type="number"
             placeholder="Height"
-            class="w-full px-3 py-2.5 bg-base-300/50 border border-base-300/50 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+            class="w-full px-3 py-2.5 bg-base-200 border border-base-300 rounded-lg text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
             value="600"
           />
         </div>
@@ -52,7 +52,7 @@
         />
       </svg>
       <h3
-        class="text-sm font-semibold text-base-content/80 uppercase tracking-wide"
+        class="text-sm font-semibold text-base-content uppercase tracking-wide"
       >
         Physics Engine
       </h3>
@@ -65,7 +65,7 @@
       >
       <select
         id="physics-engine"
-        class="w-full px-3 py-2.5 bg-base-300/50 border border-base-300/50 rounded-lg text-base-content focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+        class="w-full px-3 py-2.5 bg-base-200 border border-base-300 rounded-lg text-base-content focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
       >
         <option>Matter.js</option>
         <option disabled>Box2D (Coming Soon)</option>
@@ -83,7 +83,7 @@
         />
       </svg>
       <h3
-        class="text-sm font-semibold text-base-content/80 uppercase tracking-wide"
+        class="text-sm font-semibold text-base-content uppercase tracking-wide"
       >
         Display Settings
       </h3>
@@ -91,7 +91,7 @@
 
     <div class="space-y-3">
       <div
-        class="flex items-center justify-between p-4 bg-base-300/30 rounded-lg border border-base-300/20"
+        class="flex items-center justify-between p-4 bg-base-200 rounded-lg border border-base-300/50"
       >
         <div class="flex items-center space-x-3">
           <svg
@@ -114,7 +114,7 @@
       </div>
 
       <div
-        class="flex items-center justify-between p-4 bg-base-300/30 rounded-lg border border-base-300/20"
+        class="flex items-center justify-between p-4 bg-base-200 rounded-lg border border-base-300/50"
       >
         <div class="flex items-center space-x-3">
           <svg
@@ -142,7 +142,7 @@
         />
       </svg>
       <h3
-        class="text-sm font-semibold text-base-content/80 uppercase tracking-wide"
+        class="text-sm font-semibold text-base-content uppercase tracking-wide"
       >
         Application
       </h3>
@@ -150,7 +150,7 @@
 
     <div class="space-y-3">
       <div
-        class="flex items-center justify-between p-4 bg-base-300/30 rounded-lg border border-base-300/20"
+        class="flex items-center justify-between p-4 bg-base-200 rounded-lg border border-base-300/50"
       >
         <div class="flex items-center space-x-3">
           <svg

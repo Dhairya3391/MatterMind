@@ -12,6 +12,8 @@ function createPhysicsStore() {
     isRunning: false,
     gravity: true,
     showVectors: false,
+    showGrid: false,
+    showBounds: true,
     fps: 60,
     objectCount: 0,
   };
@@ -36,6 +38,14 @@ function createPhysicsStore() {
       update((state) => ({ ...state, showVectors: !state.showVectors })),
     setVectors: (showVectors: boolean) =>
       update((state) => ({ ...state, showVectors })),
+    toggleGrid: () =>
+      update((state) => ({ ...state, showGrid: !state.showGrid })),
+    setGrid: (showGrid: boolean) =>
+      update((state) => ({ ...state, showGrid })),
+    toggleBounds: () =>
+      update((state) => ({ ...state, showBounds: !state.showBounds })),
+    setBounds: (showBounds: boolean) =>
+      update((state) => ({ ...state, showBounds })),
     setFPS: (fps: number) => update((state) => ({ ...state, fps })),
     setObjectCount: (objectCount: number) =>
       update((state) => ({ ...state, objectCount })),

@@ -2,14 +2,12 @@
   import { physicsStore } from "$lib/stores/physics.store";
 </script>
 
-<header
-  class="h-16 bg-base-200/40 border-b border-base-300/50 backdrop-blur-sm"
->
+<header class="h-14 bg-base-200 border-b border-base-300 shadow-sm">
   <div class="h-full max-w-7xl mx-auto px-6 flex items-center justify-between">
     <!-- Logo -->
     <div class="flex items-center space-x-4">
       <div
-        class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg"
+        class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-sm"
       >
         <span class="text-primary-content font-bold text-lg">M</span>
       </div>
@@ -20,32 +18,32 @@
     </div>
 
     <!-- Center Stats -->
-    <div class="hidden lg:flex items-center space-x-8">
+    <div class="hidden lg:flex items-center space-x-4">
       <div
-        class="flex items-center space-x-3 px-4 py-2 bg-base-300/30 rounded-lg"
+        class="flex items-center space-x-2 px-3 py-1.5 bg-base-300 rounded-lg"
       >
         <div class="w-2 h-2 rounded-full bg-success"></div>
-        <span class="text-sm font-medium text-base-content/80"
+        <span class="text-sm font-medium text-base-content/70"
           >{$physicsStore.objectCount} objects</span
         >
       </div>
       <div
-        class="flex items-center space-x-3 px-4 py-2 bg-base-300/30 rounded-lg"
+        class="flex items-center space-x-2 px-3 py-1.5 bg-base-300 rounded-lg"
       >
         <div class="w-2 h-2 rounded-full bg-info"></div>
-        <span class="text-sm font-medium text-base-content/80"
+        <span class="text-sm font-medium text-base-content/70"
           >{$physicsStore.fps} FPS</span
         >
       </div>
       <div
-        class="flex items-center space-x-3 px-4 py-2 bg-base-300/30 rounded-lg"
+        class="flex items-center space-x-2 px-3 py-1.5 bg-base-300 rounded-lg"
       >
         <div
           class="w-2 h-2 rounded-full"
           class:bg-success={$physicsStore.isRunning}
           class:bg-warning={!$physicsStore.isRunning}
         ></div>
-        <span class="text-sm font-medium text-base-content/80"
+        <span class="text-sm font-medium text-base-content/70"
           >{$physicsStore.isRunning ? "Running" : "Paused"}</span
         >
       </div>
@@ -57,7 +55,7 @@
         href="https://github.com/your-repo/mattermind-svelte"
         target="_blank"
         rel="noopener noreferrer"
-        class="p-2 rounded-lg hover:bg-base-300/50 transition-colors"
+        class="p-2 rounded-lg hover:bg-base-300 transition-colors"
         aria-label="GitHub Repository"
       >
         <svg
