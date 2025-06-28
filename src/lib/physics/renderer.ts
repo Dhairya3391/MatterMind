@@ -50,7 +50,7 @@ export class Renderer {
     for (const body of bodies) {
       // Skip boundaries and mouse constraint
       if (options.boundaries?.includes(body) || body.id === -1) continue;
-      
+
       this.renderBody(body);
     }
 
@@ -97,11 +97,11 @@ export class Renderer {
       const vertices = boundary.vertices;
       this.ctx.beginPath();
       this.ctx.moveTo(vertices[0].x, vertices[0].y);
-      
+
       for (let i = 1; i < vertices.length; i++) {
         this.ctx.lineTo(vertices[i].x, vertices[i].y);
       }
-      
+
       this.ctx.closePath();
       this.ctx.stroke();
     }
@@ -116,7 +116,8 @@ export class Renderer {
     this.ctx.save();
 
     // Set color and stroke - ensure valid hex color
-    const color = obj.color && obj.color.startsWith("#") ? obj.color : "#4CAF50";
+    const color =
+      obj.color && obj.color.startsWith("#") ? obj.color : "#4CAF50";
     this.ctx.fillStyle = color;
     this.ctx.strokeStyle = obj.selected ? "#FF5722" : "#333";
     this.ctx.lineWidth = obj.selected ? 3 : 1;
@@ -373,7 +374,7 @@ export class Renderer {
 
   private renderPreviewRope(config: ObjectConfig): void {
     const radius = config.radius || 8;
-    
+
     this.ctx.beginPath();
     this.ctx.arc(0, 0, radius, 0, 2 * Math.PI);
     this.ctx.fill();
@@ -488,7 +489,7 @@ export class Renderer {
   private renderRope(body: Matter.Body): void {
     const extendedBody = body as ExtendedMatterBody;
     const radius = extendedBody.polygonRadius || 8;
-    
+
     // Render as a simple circle for now
     this.ctx.beginPath();
     this.ctx.arc(0, 0, radius, 0, 2 * Math.PI);

@@ -44,7 +44,7 @@ export class PhysicsEngine {
 
     // Setup mouse constraint for better object interaction
     this.setupMouseConstraint();
-    
+
     // Create boundaries
     this.createBoundaries();
   }
@@ -56,15 +56,15 @@ export class PhysicsEngine {
       constraint: {
         stiffness: 0.2,
         render: {
-          visible: false
-        }
-      }
+          visible: false,
+        },
+      },
     });
 
     World.add(this.engine.world, this.mouseConstraint);
-    
+
     // Keep mouse in sync with canvas
-    this.canvas.addEventListener('mousemove', (event) => {
+    this.canvas.addEventListener("mousemove", (event) => {
       const rect = this.canvas.getBoundingClientRect();
       mouse.position.x = event.clientX - rect.left;
       mouse.position.y = event.clientY - rect.top;
@@ -82,7 +82,7 @@ export class PhysicsEngine {
       canvasHeight / 2,
       wallThickness,
       canvasHeight,
-      { isStatic: true, friction: 0.3, restitution: 0.5 }
+      { isStatic: true, friction: 0.3, restitution: 0.5 },
     );
 
     // Right wall
@@ -91,7 +91,7 @@ export class PhysicsEngine {
       canvasHeight / 2,
       wallThickness,
       canvasHeight,
-      { isStatic: true, friction: 0.3, restitution: 0.5 }
+      { isStatic: true, friction: 0.3, restitution: 0.5 },
     );
 
     // Bottom wall (ground)
@@ -100,7 +100,7 @@ export class PhysicsEngine {
       canvasHeight - wallThickness / 2,
       canvasWidth,
       wallThickness,
-      { isStatic: true, friction: 0.3, restitution: 0.5 }
+      { isStatic: true, friction: 0.3, restitution: 0.5 },
     );
 
     // Top wall (ceiling)
@@ -109,7 +109,7 @@ export class PhysicsEngine {
       wallThickness / 2,
       canvasWidth,
       wallThickness,
-      { isStatic: true, friction: 0.3, restitution: 0.5 }
+      { isStatic: true, friction: 0.3, restitution: 0.5 },
     );
 
     this.boundaries = [leftWall, rightWall, ground, ceiling];
@@ -281,13 +281,14 @@ export class PhysicsEngine {
   public clearAllObjects(): void {
     // Remove all objects except boundaries
     const bodiesToRemove = this.engine.world.bodies.filter(
-      body => !this.boundaries.includes(body) && body !== this.mouseConstraint?.body
+      (body) =>
+        !this.boundaries.includes(body) && body !== this.mouseConstraint?.body,
     );
-    
-    bodiesToRemove.forEach(body => {
+
+    bodiesToRemove.forEach((body) => {
       World.remove(this.engine.world, body);
     });
-    
+
     this.objects.clear();
     this.selectedObject = null;
   }
@@ -379,7 +380,7 @@ export class PhysicsEngine {
       this.renderer.render(this.engine, {
         showBounds: this.showBounds,
         showGrid: this.showGrid,
-        boundaries: this.boundaries
+        boundaries: this.boundaries,
       });
       this.updateFPS();
       requestAnimationFrame(renderLoop);
@@ -420,10 +421,10 @@ export class PhysicsEngine {
     maxY: number;
   } {
     return {
-      minX: 0,
-      minY: 0,
-      maxX: this.canvas.width,
-      maxY: this.canvas.height,
+      minX: 20, // Account for left wall
+      minY: 20, // Account for top wall
+      maxX: this.canvas.width - 20, // Account for right wall
+      maxY: this.canvas.height - 20, // Account for bottom wall
     };
   }
 

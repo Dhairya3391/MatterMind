@@ -88,10 +88,16 @@ export function createObject(config: ObjectConfig): Matter.Body | null {
       const triangleRadius = radius || 25;
       const triangleVertices = [
         { x: 0, y: -triangleRadius },
-        { x: -triangleRadius * Math.cos(Math.PI / 6), y: triangleRadius * Math.sin(Math.PI / 6) },
-        { x: triangleRadius * Math.cos(Math.PI / 6), y: triangleRadius * Math.sin(Math.PI / 6) }
+        {
+          x: -triangleRadius * Math.cos(Math.PI / 6),
+          y: triangleRadius * Math.sin(Math.PI / 6),
+        },
+        {
+          x: triangleRadius * Math.cos(Math.PI / 6),
+          y: triangleRadius * Math.sin(Math.PI / 6),
+        },
       ];
-      
+
       body = Bodies.fromVertices(x, y, [triangleVertices], {
         isStatic,
         friction,
@@ -99,7 +105,7 @@ export function createObject(config: ObjectConfig): Matter.Body | null {
         density: calculatedDensity,
         angle: (rotation * Math.PI) / 180,
       });
-      
+
       // Mark as polygon for custom rendering
       (body as ExtendedMatterBody).isPolygon = true;
       (body as ExtendedMatterBody).polygonRadius = triangleRadius;
@@ -111,15 +117,15 @@ export function createObject(config: ObjectConfig): Matter.Body | null {
       const pentagonRadius = radius || 25;
       const pentagonVertices = [];
       const sides = 5;
-      
+
       for (let i = 0; i < sides; i++) {
         const angle = (i * 2 * Math.PI) / sides - Math.PI / 2; // Start from top
         pentagonVertices.push({
           x: pentagonRadius * Math.cos(angle),
-          y: pentagonRadius * Math.sin(angle)
+          y: pentagonRadius * Math.sin(angle),
         });
       }
-      
+
       body = Bodies.fromVertices(x, y, [pentagonVertices], {
         isStatic,
         friction,
@@ -127,7 +133,7 @@ export function createObject(config: ObjectConfig): Matter.Body | null {
         density: calculatedDensity,
         angle: (rotation * Math.PI) / 180,
       });
-      
+
       // Mark as polygon for custom rendering
       (body as ExtendedMatterBody).isPolygon = true;
       (body as ExtendedMatterBody).polygonRadius = pentagonRadius;
@@ -140,16 +146,16 @@ export function createObject(config: ObjectConfig): Matter.Body | null {
       const starVertices = [];
       const starPoints = 5;
       const innerRadius = starRadius * 0.4;
-      
+
       for (let i = 0; i < starPoints * 2; i++) {
         const angle = (i * Math.PI) / starPoints - Math.PI / 2;
         const currentRadius = i % 2 === 0 ? starRadius : innerRadius;
         starVertices.push({
           x: currentRadius * Math.cos(angle),
-          y: currentRadius * Math.sin(angle)
+          y: currentRadius * Math.sin(angle),
         });
       }
-      
+
       body = Bodies.fromVertices(x, y, [starVertices], {
         isStatic,
         friction,
@@ -157,7 +163,7 @@ export function createObject(config: ObjectConfig): Matter.Body | null {
         density: calculatedDensity,
         angle: (rotation * Math.PI) / 180,
       });
-      
+
       // Mark as polygon for custom rendering
       (body as ExtendedMatterBody).isPolygon = true;
       (body as ExtendedMatterBody).polygonRadius = starRadius;
@@ -170,7 +176,7 @@ export function createObject(config: ObjectConfig): Matter.Body | null {
       const ropeRadius = radius || 8;
       const ropeLength = 6;
       const ropeSegments = [];
-      
+
       for (let i = 0; i < ropeLength; i++) {
         const segment = Bodies.circle(x + i * ropeRadius * 1.5, y, ropeRadius, {
           isStatic: i === 0, // Only first segment is static
@@ -181,7 +187,7 @@ export function createObject(config: ObjectConfig): Matter.Body | null {
         });
         ropeSegments.push(segment);
       }
-      
+
       // Connect segments with constraints (simplified - just return first segment)
       body = ropeSegments[0];
       (body as ExtendedMatterBody).isRope = true;

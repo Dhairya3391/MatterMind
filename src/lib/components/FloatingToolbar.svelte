@@ -9,12 +9,12 @@
 
   // Available tools
   const tools = [
-    { id: "select", name: "Select", icon: "cursor", shortcut: "V" },
+    { id: "select", name: "Select", icon: "cursor", shortcut: "Q" },
     { id: "rectangle", name: "Rectangle", icon: "square", shortcut: "R" },
     { id: "circle", name: "Circle", icon: "circle", shortcut: "C" },
     { id: "polygon", name: "Polygon", icon: "hexagon", shortcut: "P" },
     { id: "triangle", name: "Triangle", icon: "triangle", shortcut: "T" },
-    { id: "pentagon", name: "Pentagon", icon: "pentagon", shortcut: "G" },
+    { id: "pentagon", name: "Pentagon", icon: "pentagon", shortcut: "N" },
     { id: "star", name: "Star", icon: "star", shortcut: "S" },
     { id: "rope", name: "Rope", icon: "rope", shortcut: "O" },
   ];
@@ -28,10 +28,44 @@
   }
 
   function handleKeydown(event: KeyboardEvent) {
+    // Check for tool shortcuts first
     const tool = tools.find((t) => t.shortcut === event.key.toUpperCase());
     if (tool) {
       event.preventDefault();
       handleToolSelect(tool.id);
+      return;
+    }
+
+    // Check for physics shortcuts
+    switch (event.key.toLowerCase()) {
+      case "g": // Gravity
+        event.preventDefault();
+        dispatch("toggleGravity");
+        break;
+      case "v": // Vectors
+        event.preventDefault();
+        dispatch("toggleVectors");
+        break;
+      case "b": // Bounds
+        event.preventDefault();
+        dispatch("toggleBounds");
+        break;
+      case " ": // Space - Play/Pause
+        event.preventDefault();
+        dispatch("togglePause");
+        break;
+      case "r": // Reset (with Ctrl/Cmd)
+        if (event.ctrlKey || event.metaKey) {
+          event.preventDefault();
+          dispatch("reset");
+        }
+        break;
+    }
+
+    // Add sidebar toggle shortcut
+    if (event.key === "Tab" && !event.ctrlKey && !event.metaKey) {
+      event.preventDefault();
+      dispatch("toggleSidebar");
     }
   }
 </script>
@@ -237,6 +271,32 @@
           class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-base-content text-base-100 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap"
         >
           Reset (Ctrl+R)
+        </div>
+      </button>
+    </div>
+
+    <!-- Divider -->
+    <div class="w-px h-6 bg-base-300-50"></div>
+
+    <!-- Sidebar Toggle -->
+    <div class="relative">
+      <button
+        class="p-2 rounded-xl transition-all duration-200 hover:bg-base-300-50 group relative"
+        on:click={() => dispatch("toggleSidebar")}
+        title="Toggle Sidebar (Tab)"
+        aria-label="Toggle Sidebar"
+      >
+        <div class="w-5 h-5 flex items-center justify-center">
+          <svg fill="currentColor" viewBox="0 0 24 24">
+            <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" />
+          </svg>
+        </div>
+
+        <!-- Tooltip -->
+        <div
+          class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-base-content text-base-100 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap"
+        >
+          Toggle Sidebar (Tab)
         </div>
       </button>
     </div>

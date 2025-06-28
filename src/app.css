@@ -5,9 +5,11 @@
 /* Global styles for nextprime theme */
 @layer base {
   * {
-    transition: color 0.2s ease, background-color 0.2s ease;
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease;
   }
-  
+
   body {
     font-smooth: antialiased;
     -webkit-font-smoothing: antialiased;
@@ -20,15 +22,15 @@
   .bg-base-200-80 {
     background-color: hsl(199, 27%, 18%, 0.8);
   }
-  
+
   .bg-base-200-90 {
     background-color: hsl(199, 27%, 18%, 0.9);
   }
-  
+
   .bg-base-300-50 {
     background-color: hsl(33, 20%, 31%, 0.5);
   }
-  
+
   .border-base-300-50 {
     border-color: hsl(33, 20%, 31%, 0.5);
   }

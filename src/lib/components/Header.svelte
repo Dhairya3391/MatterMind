@@ -22,22 +22,6 @@
       <div
         class="flex items-center space-x-2 px-3 py-1.5 bg-base-300 rounded-lg"
       >
-        <div class="w-2 h-2 rounded-full bg-success"></div>
-        <span class="text-sm font-medium text-base-content/70"
-          >{$physicsStore.objectCount} objects</span
-        >
-      </div>
-      <div
-        class="flex items-center space-x-2 px-3 py-1.5 bg-base-300 rounded-lg"
-      >
-        <div class="w-2 h-2 rounded-full bg-info"></div>
-        <span class="text-sm font-medium text-base-content/70"
-          >{$physicsStore.fps} FPS</span
-        >
-      </div>
-      <div
-        class="flex items-center space-x-2 px-3 py-1.5 bg-base-300 rounded-lg"
-      >
         <div
           class="w-2 h-2 rounded-full"
           class:bg-success={$physicsStore.isRunning}
@@ -51,8 +35,28 @@
 
     <!-- Actions -->
     <div class="flex items-center space-x-3">
+      <!-- Statistics -->
+      <div class="hidden md:flex items-center space-x-2">
+        <div
+          class="flex items-center space-x-2 px-3 py-1.5 bg-base-300 rounded-lg"
+        >
+          <div class="w-2 h-2 rounded-full bg-success"></div>
+          <span class="text-sm font-medium text-base-content/70"
+            >{$physicsStore.objectCount} objects</span
+          >
+        </div>
+        <div
+          class="flex items-center space-x-2 px-3 py-1.5 bg-base-300 rounded-lg"
+        >
+          <div class="w-2 h-2 rounded-full bg-info"></div>
+          <span class="text-sm font-medium text-base-content/70"
+            >{$physicsStore.fps} FPS</span
+          >
+        </div>
+      </div>
+
       <a
-        href="https://github.com/your-repo/mattermind-svelte"
+        href="https://github.com/Dhairya3391/mattermind"
         target="_blank"
         rel="noopener noreferrer"
         class="p-2 rounded-lg hover:bg-base-300 transition-colors"

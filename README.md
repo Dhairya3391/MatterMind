@@ -52,7 +52,7 @@ src/lib/components/
 ├── SimulationControls.svelte # Simulation control buttons
 ├── ObjectForm.svelte       # Object creation/editing form
 ├── ObjectsList.svelte      # List of created objects
-└── SettingsPanel.svelte    # Application settings
+└── FloatingToolbar.svelte  # Floating toolbar with tools and controls
 ```
 
 ### State Management
@@ -194,3 +194,38 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ---
 
 **Built with ❤️ using modern web technologies**
+
+### Keyboard Shortcuts
+
+The application supports various keyboard shortcuts for quick access:
+
+#### Tool Selection
+
+- **Q** - Select tool
+- **R** - Rectangle tool
+- **C** - Circle tool
+- **P** - Polygon tool
+- **T** - Triangle tool
+- **N** - Pentagon tool
+- **S** - Star tool
+- **O** - Rope tool
+
+#### Physics Controls
+
+- **Space** - Play/Pause simulation
+- **G** - Toggle gravity
+- **V** - Toggle velocity vectors
+- **B** - Toggle boundaries
+- **Ctrl+R** - Reset simulation
+
+#### Interface
+
+- **Tab** - Toggle sidebar
+- **Escape** - Deselect object
+- **Delete/Backspace** - Delete selected object
+
+#### Object Interaction
+
+- **Click** - Select objects
+- **Drag** - Move objects
+- **Ctrl+Click** - Multi-select (coming soon)

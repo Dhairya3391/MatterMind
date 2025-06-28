@@ -40,8 +40,7 @@ function createPhysicsStore() {
       update((state) => ({ ...state, showVectors })),
     toggleGrid: () =>
       update((state) => ({ ...state, showGrid: !state.showGrid })),
-    setGrid: (showGrid: boolean) =>
-      update((state) => ({ ...state, showGrid })),
+    setGrid: (showGrid: boolean) => update((state) => ({ ...state, showGrid })),
     toggleBounds: () =>
       update((state) => ({ ...state, showBounds: !state.showBounds })),
     setBounds: (showBounds: boolean) =>

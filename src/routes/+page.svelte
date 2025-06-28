@@ -76,8 +76,8 @@
   };
 
   // Canvas dimensions - responsive
-  let canvasWidth = 800;
-  let canvasHeight = 600;
+  let canvasWidth = 1400;
+  let canvasHeight = 720;
 
   // Reactive statements
   $: selectedObject = $selectedObjectStore;
@@ -108,8 +108,8 @@
     const container = document.querySelector(".canvas-container");
     if (container) {
       const rect = container.getBoundingClientRect();
-      canvasWidth = rect.width;
-      canvasHeight = rect.height;
+      canvasWidth = Math.max(800, rect.width - 32); // Account for padding
+      canvasHeight = Math.max(600, rect.height - 32); // Account for padding
     }
   }
 
@@ -261,6 +261,10 @@
 
   function handleToggleSettings(): void {
     settingsOpen = !settingsOpen;
+  }
+
+  function handleToggleSidebar(): void {
+    sidebarOpen = !sidebarOpen;
   }
 
   function handleReset(): void {
@@ -511,34 +515,32 @@
   <Header />
 
   <!-- Main Content -->
-  <div class="flex h-[calc(100vh-3.5rem)] relative">
+  <div
+    class="grid h-[calc(100vh-3.5rem)] relative transition-all duration-300 ease-out"
+    class:grid-cols-[320px_1fr]={sidebarOpen}
+    class:grid-cols-[0_1fr]={!sidebarOpen}
+  >
     <!-- Sidebar -->
     <div
-      class="relative z-20 transition-all duration-300 ease-out"
-      class:w-80={sidebarOpen}
-      class:w-0={!sidebarOpen}
+      class="h-full bg-base-200/90 backdrop-blur-md border-r border-base-300/50 shadow-glass overflow-hidden"
     >
-      <div
-        class="w-80 h-full bg-base-200/90 backdrop-blur-md border-r border-base-300/50 shadow-glass"
-      >
-        <Sidebar
-          bind:activeTab
-          bind:objectForm
-          {selectedObject}
-          on:togglePause={handleTogglePause}
-          on:reset={handleReset}
-          on:createPresetObjects={createPresetObjects}
-          on:toggleGravity={handleToggleGravity}
-          on:toggleVectors={handleToggleVectors}
-          on:createObject={handleCreateObject}
-          on:updateObject={handleUpdateObject}
-          on:deleteObject={handleDeleteObject}
-        />
-      </div>
+      <Sidebar
+        bind:activeTab
+        bind:objectForm
+        {selectedObject}
+        on:togglePause={handleTogglePause}
+        on:reset={handleReset}
+        on:createPresetObjects={createPresetObjects}
+        on:toggleGravity={handleToggleGravity}
+        on:toggleVectors={handleToggleVectors}
+        on:createObject={handleCreateObject}
+        on:updateObject={handleUpdateObject}
+        on:deleteObject={handleDeleteObject}
+      />
     </div>
 
     <!-- Canvas Area -->
-    <div class="flex-1 flex flex-col relative">
+    <div class="flex flex-col relative">
       <!-- Canvas Container -->
       <div class="flex-1 p-4 canvas-container">
         <div
@@ -564,6 +566,7 @@
       on:toggleGrid={handleToggleGrid}
       on:toggleBounds={handleToggleBounds}
       on:toggleSettings={handleToggleSettings}
+      on:toggleSidebar={handleToggleSidebar}
     />
 
     <!-- Floating Settings Panel -->
@@ -711,30 +714,6 @@
                 bind:checked={$physicsStore.showBounds}
                 on:change={handleToggleBounds}
               />
-            </div>
-          </div>
-
-          <!-- Stats -->
-          <div class="space-y-3">
-            <h4
-              class="text-sm font-medium text-base-content/70 uppercase tracking-wide"
-            >
-              Statistics
-            </h4>
-
-            <div class="grid grid-cols-2 gap-3">
-              <div class="p-3 bg-base-300/50 rounded-lg text-center">
-                <div class="text-2xl font-bold text-primary">
-                  {$physicsStore.objectCount}
-                </div>
-                <div class="text-xs text-base-content/60">Objects</div>
-              </div>
-              <div class="p-3 bg-base-300/50 rounded-lg text-center">
-                <div class="text-2xl font-bold text-info">
-                  {$physicsStore.fps}
-                </div>
-                <div class="text-xs text-base-content/60">FPS</div>
-              </div>
             </div>
           </div>
         </div>

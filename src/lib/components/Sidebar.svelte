@@ -5,12 +5,18 @@
   import SimulationControls from "./SimulationControls.svelte";
   import ObjectForm from "./ObjectForm.svelte";
   import ObjectsList from "./ObjectsList.svelte";
-  import SettingsPanel from "./SettingsPanel.svelte";
   import type { ObjectConfig, PhysicsObject } from "$lib/types/physics.types";
 
   // Define the form interface
   interface ObjectFormData {
-    shape: "rectangle" | "circle" | "polygon" | "triangle" | "pentagon";
+    shape:
+      | "rectangle"
+      | "circle"
+      | "polygon"
+      | "triangle"
+      | "pentagon"
+      | "star"
+      | "rope";
     name: string;
     color: string;
     width: number;
@@ -96,15 +102,6 @@
       >
         Objects ({$objectsStore.length})
       </button>
-      <button
-        class="flex-1 px-4 py-2.5 text-sm font-medium rounded-md transition-all {activeTab ===
-        'settings'
-          ? 'bg-base-200 text-base-content shadow-sm'
-          : 'text-base-content/70 hover:text-base-content hover:bg-base-300/50'}"
-        on:click={() => (activeTab = "settings")}
-      >
-        Settings
-      </button>
     </div>
   </div>
 
@@ -148,17 +145,6 @@
       <div class="p-6" in:fade={{ duration: 200 }}>
         <div class="bg-base-300 rounded-xl p-4 border border-base-300/50">
           <ObjectsList />
-        </div>
-      </div>
-    {:else if activeTab === "settings"}
-      <div class="p-6" in:fade={{ duration: 200 }}>
-        <div class="bg-base-300 rounded-xl p-4 border border-base-300/50">
-          <h3
-            class="text-sm font-semibold text-base-content mb-4 uppercase tracking-wide"
-          >
-            Application Settings
-          </h3>
-          <SettingsPanel />
         </div>
       </div>
     {/if}

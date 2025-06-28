@@ -12,7 +12,14 @@ export interface PhysicsObject {
 }
 
 export interface ObjectConfig {
-  shape: "rectangle" | "circle" | "polygon" | "triangle" | "pentagon" | "star" | "rope";
+  shape:
+    | "rectangle"
+    | "circle"
+    | "polygon"
+    | "triangle"
+    | "pentagon"
+    | "star"
+    | "rope";
   width?: number;
   height?: number;
   radius?: number;
