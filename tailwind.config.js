@@ -78,7 +78,7 @@ export default {
           "base-300": "hsl(33, 20%, 31%)" /* walnut brown surface */,
           "base-content": "hsl(31, 33%, 88%)" /* almond text */,
 
-          primary: "hsl(32, 33%, 67%)" /* khaki */,
+          "--p": "32 33% 67%" /* khaki */,
           "primary-content": "hsl(30, 11%, 4%)" /* text on primary */,
 
           secondary: "hsl(33, 20%, 31%)" /* walnut brown */,

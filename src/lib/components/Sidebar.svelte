@@ -103,11 +103,9 @@
       {#each tabs as tab}
         <button
           class="relative flex-1 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 group"
-          class:bg-primary={activeTab === tab.id}
-          class:text-primary-content={activeTab === tab.id}
-          class:shadow-lg={activeTab === tab.id}
-          class:text-base-content={activeTab !== tab.id}
-          class:hover:bg-base-200/30={activeTab !== tab.id}
+          class="{activeTab === tab.id 
+            ? 'bg-primary text-primary-content shadow-lg' 
+            : 'text-base-content hover:bg-base-200/30'}"
           on:click={() => (activeTab = tab.id)}
         >
           <div class="flex items-center justify-center space-x-2">
