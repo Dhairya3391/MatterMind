@@ -36,6 +36,29 @@ export default {
   ],
   theme: {
     extend: {
+      colors: {
+        // DaisyUI color integration with opacity support
+        primary: 'hsl(var(--p) / <alpha-value>)',
+        'primary-content': 'hsl(var(--pc) / <alpha-value>)',
+        secondary: 'hsl(var(--s) / <alpha-value>)',
+        'secondary-content': 'hsl(var(--sc) / <alpha-value>)',
+        accent: 'hsl(var(--a) / <alpha-value>)',
+        'accent-content': 'hsl(var(--ac) / <alpha-value>)',
+        neutral: 'hsl(var(--n) / <alpha-value>)',
+        'neutral-content': 'hsl(var(--nc) / <alpha-value>)',
+        'base-100': 'hsl(var(--b1) / <alpha-value>)',
+        'base-200': 'hsl(var(--b2) / <alpha-value>)',
+        'base-300': 'hsl(var(--b3) / <alpha-value>)',
+        'base-content': 'hsl(var(--bc) / <alpha-value>)',
+        info: 'hsl(var(--in) / <alpha-value>)',
+        'info-content': 'hsl(var(--inc) / <alpha-value>)',
+        success: 'hsl(var(--su) / <alpha-value>)',
+        'success-content': 'hsl(var(--suc) / <alpha-value>)',
+        warning: 'hsl(var(--wa) / <alpha-value>)',
+        'warning-content': 'hsl(var(--wac) / <alpha-value>)',
+        error: 'hsl(var(--er) / <alpha-value>)',
+        'error-content': 'hsl(var(--erc) / <alpha-value>)',
+      },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
       },
@@ -73,35 +96,35 @@ export default {
           prefersdark: true,
 
           /* Color palette mapping */
-          "base-100": "hsl(30, 11%, 4%)" /* black background */,
-          "base-200": "hsl(199, 27%, 18%)" /* gunmetal mid-layer */,
-          "base-300": "hsl(33, 20%, 31%)" /* walnut brown surface */,
-          "base-content": "hsl(31, 33%, 88%)" /* almond text */,
+          "--b1": "30 11% 4%" /* base-100: black background */,
+          "--b2": "199 27% 18%" /* base-200: gunmetal mid-layer */,
+          "--b3": "33 20% 31%" /* base-300: walnut brown surface */,
+          "--bc": "31 33% 88%" /* base-content: almond text */,
 
-          "--p": "32 33% 67%" /* khaki */,
-          "primary-content": "hsl(30, 11%, 4%)" /* text on primary */,
+          "--p": "32 33% 67%" /* primary: khaki */,
+          "--pc": "30 11% 4%" /* primary-content: text on primary */,
 
-          secondary: "hsl(33, 20%, 31%)" /* walnut brown */,
-          "secondary-content": "hsl(31, 33%, 88%)" /* almond */,
+          "--s": "33 20% 31%" /* secondary: walnut brown */,
+          "--sc": "31 33% 88%" /* secondary-content: almond */,
 
-          accent: "hsl(31, 33%, 88%)" /* almond */,
-          "accent-content": "hsl(30, 11%, 4%)" /* dark text */,
+          "--a": "31 33% 88%" /* accent: almond */,
+          "--ac": "30 11% 4%" /* accent-content: dark text */,
 
-          neutral: "hsl(199, 27%, 18%)" /* gunmetal */,
-          "neutral-content": "hsl(31, 33%, 88%)" /* almond */,
+          "--n": "199 27% 18%" /* neutral: gunmetal */,
+          "--nc": "31 33% 88%" /* neutral-content: almond */,
 
           /* Semantic colors */
-          info: "hsl(210, 100%, 65%)",
-          "info-content": "hsl(220, 100%, 15%)",
+          "--in": "210 100% 65%",
+          "--inc": "220 100% 15%",
 
-          success: "hsl(140, 50%, 50%)",
-          "success-content": "hsl(140, 100%, 10%)",
+          "--su": "140 50% 50%",
+          "--suc": "140 100% 10%",
 
-          warning: "hsl(45, 100%, 60%)",
-          "warning-content": "hsl(30, 100%, 10%)",
+          "--wa": "45 100% 60%",
+          "--wac": "30 100% 10%",
 
-          error: "hsl(0, 75%, 60%)",
-          "error-content": "hsl(0, 100%, 15%)",
+          "--er": "0 75% 60%",
+          "--erc": "0 100% 15%",
 
           /* Rounded UI */
           "--rounded-box": "1rem",
